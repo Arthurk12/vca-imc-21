@@ -14,6 +14,12 @@ applications.
 
 ## Dependencies
 
+Package dependencies:
+```
+sudo apt install scrot
+sudo apt install tshark
+```
+
 We use python to automate these calls and require the following packages:
 - guibot
 - pyautogui
