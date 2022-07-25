@@ -3,8 +3,65 @@ from guibot.guibot import GuiBot
 from pathlib import Path
 import time
 import sys
+import os
 import pyautogui
 import argparse
+
+MEET = 'meet'
+TEAMS = 'teams'
+TEAMS_APP = 'teams-app'
+ZOOM = 'zoom'
+ZOOM_APP = 'zoom-app'
+
+def file_or_directory_exists(path):
+	return os.path.exists(path)
+
+def is_file_empty(file_path):
+	return (not os.path.exists(file_path)) # or os.stat(file_path).st_size == 0
+
+def open_chrome():
+	res = Popen('google-chrome', shell=True)
+	time.sleep(2)
+
+def open_webrtc_internals():
+	pyautogui.write('chrome://webrtc-internals')
+	pyautogui.hotkey('enter')
+	time.sleep(1)
+
+def open_new_tab():
+	pyautogui.hotkey('ctrl', 't')
+	time.sleep(1)
+
+def maximize_window(guibot, vca):
+	print('Trying to maximize window!')
+	#window is already fullscreen
+	if guibot.exists('maximized.png', timeout=5):
+		return
+	if vca == TEAMS_APP:
+		if guibot.exists('teams_maximize.png', timeout=5):
+			guibot.click('teams_maximize.png')
+	# elif vca == ZOOM_APP:
+	else:
+		if guibot.exists('maximize.png', timeout=5):
+			guibot.click('maximize.png')
+		elif guibot.exists('firefox-maximize.png', timeout=5):
+			guibot.click('firefox-maximize.png')
+
+def enter_url(args):
+	pyautogui.write(args.id)
+	pyautogui.hotkey('enter')
+
+def enter_name(args, guibot, vca):
+	print('Trying to find field and enter name')
+	if vca == MEET:
+		time.sleep(2)
+	# 	if guibot.exists('meet_enter_name.png', timeout=3):
+	# 		guibot.click('meet_enter_name.png')
+	elif vca == ELOS:
+		time.sleep(2)
+	
+	pyautogui.write(args.record)
+	pyautogui.hotkey('enter')
 
 def collect_webrtc(args, ts):
 
@@ -19,19 +76,25 @@ def collect_webrtc(args, ts):
 
 	time.sleep(2)
 
-	res = Popen(f'mkdir webrtc', shell=True)
+	if not file_or_directory_exists(os.path.abspath(os.getcwd())+'/webrtc'):
+		res = Popen(f'mkdir webrtc', shell=True)
 
-	res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{ts}.json', 
+	res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{ts}-{args.vca}-{args.record}.json', 
 		shell=True)
 
+	printheader = is_file_empty(os.path.abspath(os.getcwd())+'/stats.log')
+	print(printheader)
 	with open('stats.log', 'a') as f:
+		if printheader:
+			f.write(f'\n[time]-[vca]-[browser]-[name_of_test]')
 		f.write(f'\n{ts}-{args.vca}-{args.browser}-{args.record}')
 
 	return
 
 def capture_traffic(args, ts):
 
-	_ = Popen(f'mkdir captures', shell=True)
+	if not file_or_directory_exists(os.path.abspath(os.getcwd())+'/captures'):
+		_ = Popen(f'mkdir captures', shell=True)
 
 	filename = f'captures/{ts}.pcap'
 
@@ -49,18 +112,22 @@ def launch_meet(args):
 	pyautogui.write('chrome://webrtc-internals')
 	pyautogui.hotkey('enter')
 	time.sleep(1)
+def launch_meet(args):
 
-	pyautogui.hotkey('command', 't')
-	time.sleep(1)
+	open_chrome()
 
-	pyautogui.write(args.id)
-	pyautogui.hotkey('enter')
+	open_webrtc_internals()
+
+	open_new_tab()
+
+	enter_url()
 
 	guibot = GuiBot()
 	guibot.add_path('media')
 
-	if guibot.exists('maximize.png', timeout=5):
-		guibot.click('maximize.png')
+	maximize_window(guibot, MEET)
+
+	enter_name(args, guibot, MEET)
 
 	if guibot.exists('meet_join_now.png', timeout=20):
 		guibot.click('meet_join_now.png')
@@ -75,7 +142,7 @@ def launch_meet(args):
 	
 	collect_webrtc(args, ts)
 
-	pyautogui.hotkey('command', 'w')
+	pyautogui.hotkey('ctrl', 'w')
 
 	if guibot.exists('meet_end_call.png', timeout=5):
 		guibot.click('meet_end_call.png')
@@ -83,7 +150,7 @@ def launch_meet(args):
 	if guibot.exists('meet_leave_call.png', timeout=5):
 		guibot.click('meet_leave_call.png')
 
-	pyautogui.hotkey('command', 'w')
+	pyautogui.hotkey('ctrl', 'w')
 
 	return 
 
@@ -91,9 +158,7 @@ def launch_zoom(args):
 	guibot = GuiBot()
 	guibot.add_path('media')
 
-	res = Popen('open chrome.app', shell=True)
-
-	time.sleep(2)
+	open_chrome()
 
 	pyautogui.write(args.id)
 	pyautogui.hotkey('enter')
@@ -101,8 +166,7 @@ def launch_zoom(args):
 
 	if args.browser:
 
-		if guibot.exists('maximize.png', timeout=5):
-			guibot.click('maximize.png')
+		maximize_window(guibot, ZOOM)
 
 		if guibot.exists('zoom_cancel.png', timeout=10):
 			guibot.click('zoom_cancel.png')
@@ -136,7 +200,7 @@ def launch_zoom(args):
 
 		time.sleep(1)
 
-		pyautogui.hotkey('command', 'w')
+		pyautogui.hotkey('ctrl', 'w')
 
 		with open('stats.log', 'a') as f:
 			f.write(f'\n{ts}-{args.vca}-{args.browser}-{args.record}')
@@ -153,8 +217,7 @@ def launch_zoom(args):
 
 		time.sleep(15)
 
-		if guibot.exists('maximize.png', timeout=5):
-			guibot.click('maximize.png')
+		maximize_window(guibot, ZOOM_APP)
 
 		ts = int(time.time())
 
@@ -173,7 +236,7 @@ def launch_zoom(args):
 
 		time.sleep(2)
 
-		pyautogui.hotkey('command', 'w')
+		pyautogui.hotkey('ctrl', 'w')
 
 		res = Popen('killall "Google Chrome"', shell=True)
 
@@ -184,15 +247,11 @@ def launch_teams(args):
 	guibot = GuiBot()
 	guibot.add_path('media')
 
-	res = Popen('open chrome.app', shell=True)
+	open_chrome()
 
-	time.sleep(2)
+	open_webrtc_internals()
 
-	pyautogui.write('chrome://webrtc-internals')
-	pyautogui.hotkey('enter')
-	time.sleep(1)
-
-	pyautogui.hotkey('command', 't')
+	pyautogui.hotkey('ctrl', 't')
 	time.sleep(1)
 
 	pyautogui.write(args.id)
@@ -207,8 +266,7 @@ def launch_teams(args):
 		time.sleep(10)
 		if guibot.exists('teams_join_now.png', timeout=20):
 			guibot.click('teams_join_now.png')
-		if guibot.exists('maximize.png', timeout=5):
-			guibot.click('maximize.png')
+		maximize_window(guibot, TEAMS)
 
 		pyautogui.moveTo(800, 620, duration=1.5)
 
@@ -223,7 +281,7 @@ def launch_teams(args):
 
 		collect_webrtc(args, ts)
 
-		pyautogui.hotkey('command', 'w')
+		pyautogui.hotkey('ctrl', 'w')
 
 		pyautogui.moveTo(800, 620, duration=1.5)
 
@@ -232,7 +290,7 @@ def launch_teams(args):
 
 		time.sleep(2)
 
-		pyautogui.hotkey('command', 'w')
+		pyautogui.hotkey('ctrl', 'w')
 
 	else:
 
@@ -247,8 +305,7 @@ def launch_teams(args):
 		if guibot.exists('teams_client_x.png', timeout=10):
 			guibot.click('teams_client_x.png')
 
-		if guibot.exists('teams_maximize.png', timeout=5):
-			guibot.click('teams_maximize.png')
+		maximize_window(guibot, TEAMS_APP)
 
 		ts = int(time.time())
 
@@ -273,9 +330,9 @@ def launch_teams(args):
 
 def launch(args):
 
-	if args.vca == 'meet':
+	if args.vca == MEET:
 		launch_meet(args)
-	elif args.vca == 'zoom':
+	elif args.vca == ZOOM:
 		launch_zoom(args)
 	else:
 		launch_teams(args)
