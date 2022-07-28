@@ -19,7 +19,12 @@ do
 		echo $line	
 		a=( $line )
 		echo "Setting ${a[1]} down and ${a[2]} up"
-		python3 test.py $APP $TIME -i $CAP_INTERFACE -id $URL -r ${a[1]}-${a[2]} 
+		python3 test.py $APP $TIME -i $CAP_INTERFACE -id $URL -r ${a[1]}-${a[2]}
+		ret=$?
+		echo $ret
+		if [ $ret -ne 0 ]; then
+			exit 5
+		fi
 		sleep 1
 		
 	done < $TRACE
