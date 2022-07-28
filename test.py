@@ -12,12 +12,19 @@ TEAMS = 'teams'
 TEAMS_APP = 'teams-app'
 ZOOM = 'zoom'
 ZOOM_APP = 'zoom-app'
+ELOS = 'elos'
 
 def file_or_directory_exists(path):
 	return os.path.exists(path)
 
 def is_file_empty(file_path):
 	return (not os.path.exists(file_path)) # or os.stat(file_path).st_size == 0
+
+def guibot_click(guibot, filename, timeout):
+	if guibot.exists(filename, timeout):
+		guibot.click(filename)
+	else:
+		raise Exception('Failed to find element: ', filename)
 
 def open_chrome():
 	res = Popen('google-chrome', shell=True)
@@ -63,6 +70,32 @@ def enter_name(args, guibot, vca):
 	pyautogui.write(args.record)
 	pyautogui.hotkey('enter')
 
+def share_camera(guibot, vca):
+	print('Trying to share camera')
+	if vca == ELOS:
+		guibot_click(guibot, 'elos_camera_open_modal.png', 20)
+		time.sleep(5)
+		for x in range(2):
+			pyautogui.hotkey('tab')
+		pyautogui.hotkey('enter')
+		pyautogui.hotkey('down')
+		pyautogui.hotkey('enter')
+
+		for x in range(7):
+			pyautogui.hotkey('tab')
+		pyautogui.hotkey('enter')
+
+def quit_call(guibot, vca):
+	if vca == MEET:
+		print('aoreuch')
+		#
+	elif vca == ELOS:
+		# guibot_click(guibot, 'elos_three_dots', 20)
+		pyautogui.hotkey('alt', 'shift', 'O')
+		for x in range(6):
+			pyautogui.hotkey('down')
+		pyautogui.hotkey('enter')
+
 def collect_webrtc(args, ts):
 
 	guibot = GuiBot()
@@ -104,14 +137,59 @@ def capture_traffic(args, ts):
 
 	return
 
-def launch_meet(args):
+def launch_elos(args):
 
-	res = Popen('open chrome.app', shell=True)
-	time.sleep(2)
+	open_chrome()
 
-	pyautogui.write('chrome://webrtc-internals')
+	open_webrtc_internals()
+
+	open_new_tab()
+
+	enter_url(args)
+
+	guibot = GuiBot()
+	guibot.add_path('media')
+
+	# maximize_window(guibot, ELOS)
+
+	guibot_click(guibot, 'elos_sign_in_as_guest.png', 20)
+	
+	enter_name(args, guibot, ELOS)
+
+	pyautogui.hotkey('tab')
+	pyautogui.write(args.record+'@test.com')
+	#submit name and email
 	pyautogui.hotkey('enter')
+
 	time.sleep(1)
+	#Join meeting
+	pyautogui.hotkey('enter')
+	
+	time.sleep(3)
+
+	guibot_click(guibot, 'elos_join_microphone.png', 20)
+
+	guibot_click(guibot, 'elos_activate_audio_echo_test.png', 20)
+
+	share_camera(guibot, ELOS)
+
+	ts = int(time.time())
+
+	capture_traffic(args, ts)
+
+	pyautogui.hotkey('ctrl', 'tab')
+	
+	collect_webrtc(args, ts)
+
+	pyautogui.hotkey('ctrl', 'tab')
+
+	quit_call(guibot, ELOS)
+
+	pyautogui.hotkey('ctrl', 'w')
+	pyautogui.hotkey('ctrl', 'w')
+
+	return
+
 def launch_meet(args):
 
 	open_chrome()
@@ -334,6 +412,8 @@ def launch(args):
 		launch_meet(args)
 	elif args.vca == ZOOM:
 		launch_zoom(args)
+	elif args.vca == ELOS:
+		launch_elos(args)
 	else:
 		launch_teams(args)
 
@@ -392,4 +472,11 @@ def execute():
 
 
 if __name__ == '__main__':
-	execute()
+	try:
+		execute()
+
+	except Exception as error:
+		print(error)
+		res = Popen('killall chrome', shell=True)
+		quit(-1)
+	quit()
