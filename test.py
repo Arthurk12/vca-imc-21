@@ -120,7 +120,7 @@ def collect_webrtc(args, ts):
 	with open('stats.log', 'a') as f:
 		if printheader:
 			f.write(f'\n[time]-[vca]-[browser]-[name_of_test]')
-		f.write(f'\n{ts}-{args.vca}-{args.browser}-{args.record}')
+		f.write(f'\n{ts}-{args.vca}-{args.record}')
 
 	return
 
@@ -129,7 +129,7 @@ def capture_traffic(args, ts):
 	if not file_or_directory_exists(os.path.abspath(os.getcwd())+'/captures'):
 		_ = Popen(f'mkdir captures', shell=True)
 
-	filename = f'captures/{ts}.pcap'
+	filename = f'captures/{ts}-{args.vca}-{args.record}.pcap'
 
 	cmd = f'tshark -i {args.interface} -w {filename} -a duration:{str(args.time)}'
 	res = Popen(cmd, shell=True)
