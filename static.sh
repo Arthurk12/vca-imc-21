@@ -29,11 +29,11 @@ do
 		ret=$?
 		echo $ret
 		if [ $ret -ne 0 ]; then
-			./shaper.sh stop
+			./shaper.sh stop 0 0 0 0 $SHAPE_INTERFACE
 			exit 5
 		fi
 		sleep 1
-		./shaper.sh stop
+		./shaper.sh stop 0 0 0 0 $SHAPE_INTERFACE
 		
 	done < $TRACE
 done
