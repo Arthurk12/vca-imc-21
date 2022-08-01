@@ -1,0 +1,1 @@
+sudo rm -r webrtc/ captures/ imglog/ .screenshot*.png stats.log
