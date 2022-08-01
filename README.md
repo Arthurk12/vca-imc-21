@@ -25,6 +25,16 @@ We use python to automate these calls and require the following packages:
 - pyautogui
 
 ## Automating many calls and limiting available bandwidth
+Open 2 terminals, in the first run:
+```
+  sudo modprobe v4l2loopback card_label="My Fake Webcam" exclusive_caps=1
+  ffmpeg -stream_loop -1 -re -i /home/arthur/Documents/TCC/Experimentos/vca-imc-21/media/test.mp4 -vcodec rawvideo -threads 0 -f v4l2 /dev/video2
+```
+And leave it open.
+On the second one, run:
+```
+  ./static.sh elos 20 enp2s0 enp2s0 static.trace https://elos.vc/arthur-bockmann-grossi
+```
 We use `static.sh` to automate many calls and limit the available bandwidth.
 It is a wrapper script for `test.py`, which is explained in the next section.
 In our experiments, we shaped the interface on the router instead of on the 
