@@ -25,21 +25,21 @@ then
   exit
 fi
 
-  modprobe ifb numifbs=1
-  ip link set dev ifb0 up
-  $TC qdisc add dev ifb0 root handle 1: htb default 10
-  $TC filter add dev $IFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev ifb0
-  $TC filter add dev $IFACE parent ffff: protocol ipv6 u32 match u32 0 0 action mirred egress redirect dev ifb0
+  sudo modprobe ifb numifbs=1
+  sudo ip link set dev ifb0 up
+  sudo $TC qdisc add dev ifb0 root handle 1: htb default 10
+  sudo $TC filter add dev $IFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev ifb0
+  sudo $TC filter add dev $IFACE parent ffff: protocol ipv6 u32 match u32 0 0 action mirred egress redirect dev ifb0
   
-  $TC qdisc add dev $IFACE handle ffff: ingress
-  $TC class add dev ifb0 parent 1: classid 1:1 htb rate $DNLD
-  $TC class add dev ifb0 parent 1:1 classid 1:10 htb rate $DNLD
-  $TC qdisc add dev ifb0 parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}%
+  sudo $TC qdisc add dev $IFACE handle ffff: ingress
+  sudo $TC class add dev ifb0 parent 1: classid 1:1 htb rate $DNLD
+  sudo $TC class add dev ifb0 parent 1:1 classid 1:10 htb rate $DNLD
+  sudo $TC qdisc add dev ifb0 parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}%
 
   # UPLINK settings
-  $TC qdisc add dev $IFACE root handle 1: htb default 10
-  $TC class add dev $IFACE parent 1: classid 1:1 htb rate $UPLD
-  $TC class add dev $IFACE parent 1:1 classid 1:10 htb rate $UPLD 
+  sudo $TC qdisc add dev $IFACE root handle 1: htb default 10
+  sudo $TC class add dev $IFACE parent 1: classid 1:1 htb rate $UPLD
+  sudo $TC class add dev $IFACE parent 1:1 classid 1:10 htb rate $UPLD 
   #$TC qdisc add dev $IFACE parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}% 
 
 
@@ -49,31 +49,31 @@ fi
 stop() {
 
   # Stop the bandwidth shaping.
-  $TC qdisc del dev ifb0 root
-  $TC qdisc del dev $IFACE root
+  sudo $TC qdisc del dev ifb0 root
+  sudo $TC qdisc del dev $IFACE root
 
 }
 
 stop_all() {
 
-    $TC qdisc del dev $IFACE root
+    sudo $TC qdisc del dev $IFACE root
     
 }
 
 update() {
 
 echo $DNLD
-    $TC class change dev ifb0 parent 1:1 classid 1:10 htb rate $DNLD
-    $TC qdisc replace dev ifb0 parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}%
-    $TC class change dev $IFACE parent 1:1 classid 1:10 htb rate $UPLD
-    $TC qdisc replace dev $IFACE parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}%
+    sudo $TC class change dev ifb0 parent 1:1 classid 1:10 htb rate $DNLD
+    sudo $TC qdisc replace dev ifb0 parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}%
+    sudo $TC class change dev $IFACE parent 1:1 classid 1:10 htb rate $UPLD
+    sudo $TC qdisc replace dev $IFACE parent 1:10 netem delay ${LATENCY}ms loss ${LOSS}%
 }
 
 show() {
 
-    $TC -s qdisc ls dev $IFACE
-    $TC class show dev $IFACE
-    $TC filter show dev $IFACE
+    sudo $TC -s qdisc ls dev $IFACE
+    sudo $TC class show dev $IFACE
+    sudo $TC filter show dev $IFACE
 
 }
 
