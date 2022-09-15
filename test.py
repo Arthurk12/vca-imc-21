@@ -72,17 +72,20 @@ def enter_name(args, guibot, vca):
 
 def share_camera(guibot, vca):
 	print('Trying to share camera')
+	time.sleep(2)
 	if vca == ELOS:
 		guibot_click(guibot, 'elos_camera_open_modal.png', 20)
 		time.sleep(5)
 		for x in range(2):
 			pyautogui.hotkey('tab')
+			time.sleep(0.05)
 		pyautogui.hotkey('enter')
 		pyautogui.hotkey('down')
 		pyautogui.hotkey('enter')
 
 		for x in range(7):
 			pyautogui.hotkey('tab')
+			time.sleep(0.05)
 		pyautogui.hotkey('enter')
 
 def quit_call(guibot, vca):
@@ -184,8 +187,9 @@ def launch_elos(args):
 	pyautogui.hotkey('ctrl', 'tab')
 
 	quit_call(guibot, ELOS)
-
+	time.sleep(0.25)
 	pyautogui.hotkey('ctrl', 'w')
+	time.sleep(0.05)
 	pyautogui.hotkey('ctrl', 'w')
 
 	return
