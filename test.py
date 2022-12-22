@@ -115,7 +115,7 @@ def collect_webrtc(args, ts):
 	if not file_or_directory_exists(os.path.abspath(os.getcwd())+'/webrtc'):
 		res = Popen(f'mkdir webrtc', shell=True)
 
-	res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{ts}-{args.vca}-{args.record}.json', 
+	res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{args.vca}-{args.record}[{args.counter}].json', 
 		shell=True)
 
 	printheader = is_file_empty(os.path.abspath(os.getcwd())+'/stats.log')
@@ -462,6 +462,13 @@ def build_parser():
 		default=None,
 		action='store',
 		help='Interface to capture network traffic'
+	)
+
+	parser.add_argument(
+		'-c', '--counter',
+		default=None,
+		action='store',
+		help='Number of the experiment execution'
 	)
 
 	return parser

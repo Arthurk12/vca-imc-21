@@ -25,7 +25,7 @@ do
 		a=( $line )
 		echo "Setting ${a[0]} down and ${a[1]} up"
 		./shaper.sh start ${a[0]} ${a[1]} 0 0 $SHAPE_INTERFACE
-		python3 test.py $APP $TIME -i $CAP_INTERFACE -id $URL -r ${a[0]}-${a[1]}
+		python3 test.py $APP $TIME -i $CAP_INTERFACE -id $URL -r ${a[0]}-${a[1]} -c $i
 		ret=$?
 		echo $ret
 		if [ $ret -ne 0 ]; then
