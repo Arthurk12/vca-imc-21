@@ -95,7 +95,7 @@ def quit_call(guibot, vca):
 	elif vca == ELOS:
 		# guibot_click(guibot, 'elos_three_dots', 20)
 		pyautogui.hotkey('alt', 'shift', 'O')
-		for x in range(6):
+		for x in range(7):
 			pyautogui.hotkey('down')
 		pyautogui.hotkey('enter')
 
@@ -164,7 +164,7 @@ def launch_elos(args):
 	#submit name and email
 	pyautogui.hotkey('enter')
 
-	time.sleep(1)
+	time.sleep(3)
 	#Join meeting
 	pyautogui.hotkey('enter')
 	
