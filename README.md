@@ -20,9 +20,10 @@ sudo apt install scrot
 sudo apt install tshark
 ```
 
-We use python to automate these calls and require the following packages:
-- guibot
-- pyautogui
+Python package dependencies:
+```
+pip install -r requirements.txt
+```
 
 ## Automating many calls and limiting available bandwidth
 Open 2 terminals, in the first run:
@@ -33,7 +34,7 @@ Open 2 terminals, in the first run:
 And leave it open.
 On the second one, run:
 ```
-  ./static.sh elos 20 enp2s0 enp2s0 static.trace https://elos.vc/arthur-bockmann-grossi
+  ./static.sh elos 20 enp2s0 enp2s0 config/static.trace https://elos.vc/arthur-bockmann-grossi
 ```
 We use `static.sh` to automate many calls and limit the available bandwidth.
 It is a wrapper script for `test.py`, which is explained in the next section.
