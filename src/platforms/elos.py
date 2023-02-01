@@ -2,6 +2,10 @@ from platforms.vca import VCA
 import pyautogui
 import time
 
+LOW_QUALITY, MEDIUM_QUALITY, HIGH_QUALITY, ULTRA_HIGH_QUALITY = range(4)
+
+DEFAULT_QUALITY = ULTRA_HIGH_QUALITY
+
 class Elos(VCA):
   def enter_url(self):
     pyautogui.write(self.url)
@@ -31,8 +35,33 @@ class Elos(VCA):
     self.guibot_click('elos_join_microphone.png')
 
     self.guibot_click('elos_activate_audio_echo_test.png')
+  
+  def low_quality():
+    pyautogui.hotkey('enter')
+    pyautogui.hotkey('up')
+    pyautogui.hotkey('enter')
+    time.sleep(3)
 
-  def share_camera(self):
+  def medium_quaity():
+    # Do nothing
+    # Put a time sleep here, just because a function can't be empty in python
+    time.sleep(0.01)
+  
+  def high_quality():
+    pyautogui.hotkey('enter')
+    pyautogui.hotkey('down')
+    pyautogui.hotkey('enter')
+    time.sleep(3)
+  
+  def ultra_high_quality():
+    pyautogui.hotkey('enter')
+    for i in range(2):
+      pyautogui.hotkey('down')
+      time.sleep(0.05)
+    pyautogui.hotkey('enter')
+    time.sleep(3)
+
+  def share_camera(self, quality = DEFAULT_QUALITY):
     time.sleep(2)
 
     self.guibot_click('elos_camera_open_modal.png')
@@ -45,9 +74,21 @@ class Elos(VCA):
     pyautogui.hotkey('enter')
     pyautogui.hotkey('down')
     pyautogui.hotkey('enter')
+    pyautogui.hotkey('tab')
+
+    if (quality == LOW_QUALITY):
+      Elos.low_quality()
+    elif(quality == MEDIUM_QUALITY):
+      Elos.medium_quaity()
+    elif(quality == HIGH_QUALITY):
+      Elos.high_quality()
+    elif(quality == ULTRA_HIGH_QUALITY):
+      Elos.ultra_high_quality()
+    else:
+      Elos.medium_quaity()
 
     # skip to the "share" button
-    for x in range(7):
+    for x in range(6):
       pyautogui.hotkey('tab')
       time.sleep(0.05)
     pyautogui.hotkey('enter')
