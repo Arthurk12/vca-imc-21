@@ -68,7 +68,7 @@ class VCA:
     self.url = args.url
     self.vca = args.vca
     self.duration = args.duration
-    self.timeout = (3-float(args.download))*VCA.DEFAULT_TIMEOUT
+    self.timeout = (3000-float(args.download)/1000)*VCA.DEFAULT_TIMEOUT
     self.interactor = Interactor()
     Chrome.open()
     Chrome.open_webrtc_internals()

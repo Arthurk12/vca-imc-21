@@ -18,6 +18,7 @@ Package dependencies:
 ```
 sudo apt install scrot
 sudo apt install tshark
+sudo apt install wondershaper
 ```
 
 Python package dependencies:

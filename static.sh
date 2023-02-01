@@ -18,16 +18,15 @@ do
 		echo $line	
 		a=( $line )
 		echo "Setting ${a[0]} down and ${a[1]} up"
-		./shaper.sh start ${a[0]} ${a[1]} 0 0 $SHAPE_INTERFACE
+		sudo wondershaper $SHAPE_INTERFACE ${a[0]} ${a[1]}
 		python3 src/test.py $APP $TIME -i $CAP_INTERFACE -u $URL -d ${a[0]} -p ${a[1]} -c $i
 		ret=$?
 		echo $ret
+		sleep 1
+		sudo wondershaper clear $SHAPE_INTERFACE
 		if [ $ret -ne 0 ]; then
-			./shaper.sh stop 0 0 0 0 $SHAPE_INTERFACE
 			exit 5
 		fi
-		sleep 1
-		./shaper.sh stop 0 0 0 0 $SHAPE_INTERFACE
 		
 	done < $TRACE
 done
