@@ -61,12 +61,12 @@ class VCA:
     self.collect_webrtc_dump()
     Chrome.switch_tab()
   
-  def __init__(self, args):
+  def __init__(self, args, vca):
     self.record = self.create_record(args)
     self.interface = args.interface
     self.counter = args.counter
     self.url = args.url
-    self.vca = args.vca
+    self.vca = vca
     self.duration = args.duration
     self.timeout = (3000-float(args.download)/1000)*VCA.DEFAULT_TIMEOUT
     self.interactor = Interactor()

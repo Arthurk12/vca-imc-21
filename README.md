@@ -35,7 +35,7 @@ Open 2 terminals, in the first run:
 And leave it open.
 On the second one, run:
 ```
-  ./static.sh elos 20 enp2s0 enp2s0 config/static.trace https://elos.vc/arthur-bockmann-grossi
+  ./static.sh https://elos.vc/arthur-bockmann-grossi 20 enp2s0 enp2s0 config/static.trace 
 ```
 We use `static.sh` to automate many calls and limit the available bandwidth.
 It is a wrapper script for `test.py`, which is explained in the next section.
@@ -49,7 +49,7 @@ locally on non-Unix machines.
 Assuming `static.sh` is correctly configured, you can automate calls using 
 the following command:
 
-`./static.sh [VCA] [DURATION] [CAPTURE INTERFACE] [SHAPING INTERFACE] [TRACE] [URL]`
+`./static.sh [URL] [DURATION] [CAPTURE INTERFACE] [SHAPING INTERFACE] [TRACE]`
 
 - `VCA` is either 'zoom', 'meet', or 'teams'. 
 - `DURATION` is the call duration. 
@@ -73,13 +73,14 @@ directory). You may also choose to capture the network traffic using the
 `-r` flag. Note: if you choose to capture traffic you must also specify an 
 interface to capture on using the `-i` flag. A sample command could be:
 
-`python3 test.py [VCA] [DURATION] -i [INTERFACE] -id [URL] -r [DOWN]-[UP]`
+`python3 test.py [URL] [DURATION] -i [INTERFACE] -d [DOWN] -p[UP] -c [COUNT]`
 
 - `VCA` is either 'zoom', 'meet', or 'teams'.
 - `DURATION` is the call duration.
 - `INTERFACE` is the capture interface.
 - `URL` is the meeting url
 - `DOWN`-`UP` are identifiers used for logging
+- `COUNT` is the iteration number, this is handled by the static.sh script
 
 ***
 

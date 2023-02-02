@@ -1,4 +1,5 @@
 from platforms.vca import VCA
+from platforms.constants import ELOS
 import pyautogui
 import time
 
@@ -7,6 +8,9 @@ LOW_QUALITY, MEDIUM_QUALITY, HIGH_QUALITY, ULTRA_HIGH_QUALITY = range(4)
 DEFAULT_QUALITY = ULTRA_HIGH_QUALITY
 
 class Elos(VCA):
+  def __init__(self, args, vca=ELOS):
+    super(VCA, self).__init__(args, vca)
+
   def enter_url(self):
     pyautogui.write(self.url)
     pyautogui.hotkey('enter')

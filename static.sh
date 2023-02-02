@@ -1,11 +1,10 @@
 #!/bin/bash
 
-APP=$1
+URL=$1
 TIME=$2
 CAP_INTERFACE=$3
 SHAPE_INTERFACE=$4
 TRACE=$5
-URL=$6
 
 echo "Reading trace $TRACE"
 
@@ -19,7 +18,7 @@ do
 		a=( $line )
 		echo "Setting ${a[0]} down and ${a[1]} up"
 		sudo wondershaper $SHAPE_INTERFACE ${a[0]} ${a[1]}
-		python3 src/test.py $APP $TIME -i $CAP_INTERFACE -u $URL -d ${a[0]} -p ${a[1]} -c $i
+		python3 src/test.py -u $URL $TIME -i $CAP_INTERFACE -d ${a[0]} -p ${a[1]} -c $i
 		ret=$?
 		echo $ret
 		sleep 1

@@ -1,9 +1,22 @@
 from subprocess import PIPE, Popen
 from platforms.elos import Elos
+from platforms.bbb_local_server import BBBLocalServer
+from platforms.constants import ELOS, BBB_LOCAL
 import argparse
 
+def infer_vca_from_url(url):
+	host = url.split("//")[-1].split("/")[0].split('?')[0]
+	if ELOS in host:
+		return ELOS
+	else:
+		return BBB_LOCAL
+
 def launch(args):
-	vca = Elos(args)
+	if (infer_vca_from_url(args.url) == ELOS):
+		vca = Elos(args)
+	else:
+		vca = BBBLocalServer(args)
+	
 	vca.enter_url()
 	vca.join_as_guest()
 	vca.enter_guest_data()
@@ -22,20 +35,13 @@ def build_parser():
 		description='Initiate and capture video call')
 
 	parser.add_argument(
-		'vca',
-		help="VCA to use"
+		'-u', '--url',
+		help='Url to join the conference'
 	)
 
 	parser.add_argument(
 		'duration',
 		help='Length of call'
-	)
-
-	parser.add_argument(
-		'-u', '--url',
-		default=None,
-		action='store',
-		help='Meeting ID'
 	)
 
 	parser.add_argument(
