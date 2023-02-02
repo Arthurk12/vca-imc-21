@@ -5,7 +5,7 @@ import time
 
 class BBBLocalServer(Elos):
   def __init__(self, args, vca=BBB_LOCAL):
-    super(Elos, self).__init__(args, vca)
+    super().__init__(args, vca)
   
   def join_as_guest(self):
     time.sleep(1)
