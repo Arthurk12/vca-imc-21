@@ -20,9 +20,11 @@ do
     if [ ${a[0]} -ne "0" ] && [ ${a[1]} -ne "0" ]; then
       sudo wondershaper $SHAPE_INTERFACE ${a[0]} ${a[1]}
     fi
+    tmux new -d 'ffmpeg -stream_loop -1 -re -i media/test.mp4 -vcodec rawvideo -threads 0 -f v4l2 /dev/video0'
 		python3 src/test.py -u $URL $TIME -i $CAP_INTERFACE -d ${a[0]} -p ${a[1]} -c $i
 		ret=$?
 		echo $ret
+    tmux kill-session -t 0
 		sleep 1
     if [ ${a[0]} -ne "0" ] && [ ${a[1]} -ne "0" ]; then
       sudo wondershaper clear $SHAPE_INTERFACE
