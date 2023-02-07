@@ -60,6 +60,11 @@ class VCA:
     Chrome.switch_tab()
     self.collect_webrtc_dump()
     Chrome.switch_tab()
+
+  def calculate_timeout(download):
+    if(download == 0):
+      return VCA.DEFAULT_TIMEOUT
+    return ((3000-float(download))/1000)*VCA.DEFAULT_TIMEOUT
   
   def __init__(self, args, vca):
     self.record = self.create_record(args)
@@ -68,7 +73,7 @@ class VCA:
     self.url = args.url
     self.vca = vca
     self.duration = args.duration
-    self.timeout = (3000-float(args.download)/1000)*VCA.DEFAULT_TIMEOUT
+    self.timeout = VCA.calculate_timeout(args.download)
     self.interactor = Interactor()
     Chrome.open()
     Chrome.open_webrtc_internals()

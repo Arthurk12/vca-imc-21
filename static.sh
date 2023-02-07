@@ -17,12 +17,16 @@ do
 		echo $line	
 		a=( $line )
 		echo "Setting ${a[0]} down and ${a[1]} up"
-		sudo wondershaper $SHAPE_INTERFACE ${a[0]} ${a[1]}
+    if [ ${a[0]} -ne "0" ] && [ ${a[1]} -ne "0" ]; then
+      sudo wondershaper $SHAPE_INTERFACE ${a[0]} ${a[1]}
+    fi
 		python3 src/test.py -u $URL $TIME -i $CAP_INTERFACE -d ${a[0]} -p ${a[1]} -c $i
 		ret=$?
 		echo $ret
 		sleep 1
-		sudo wondershaper clear $SHAPE_INTERFACE
+    if [ ${a[0]} -ne "0" ] && [ ${a[1]} -ne "0" ]; then
+      sudo wondershaper clear $SHAPE_INTERFACE
+    fi
 		if [ $ret -ne 0 ]; then
 			exit 5
 		fi
