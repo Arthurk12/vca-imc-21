@@ -40,6 +40,11 @@ class Elos(VCA):
 
     self.guibot_click('elos_activate_audio_echo_test.png')
   
+  def close_audio_modal(self):
+    time.sleep(3)
+
+    self.guibot_click('close_audio_modal.png')
+  
   def low_quality():
     pyautogui.hotkey('enter')
     pyautogui.hotkey('up')

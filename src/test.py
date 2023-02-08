@@ -21,7 +21,7 @@ def launch(args):
 	vca.join_as_guest()
 	vca.enter_guest_data()
 	vca.join_meeting()
-	vca.join_microphone()
+	vca.close_audio_modal()
 	vca.share_camera()
 	vca.collect_data()
 	vca.quit_call()
