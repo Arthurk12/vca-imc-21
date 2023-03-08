@@ -70,9 +70,9 @@ class VCA:
   def collect_data(self):
     self.get_time()
     self.capture_traffic()
-    Chrome.switch_tab()
+    self.browser.switch_tab()
     self.collect_webrtc_dump()
-    Chrome.switch_tab()
+    self.browser.switch_tab()
 
   def calculate_timeout(download):
     if(download == 0):
@@ -88,12 +88,13 @@ class VCA:
     self.duration = args.duration
     self.timeout = VCA.calculate_timeout(args.download)
     self.interactor = Interactor()
-    Chrome.open()
-    Chrome.open_webrtc_internals()
-    Chrome.open_new_tab()
+    self.browser = Chrome(self.record, True, False)
+    self.browser.open()
+    self.browser.open_webrtc_internals()
+    self.browser.open_new_tab()
   
   def __del__(self):
     # closes vca tab
-    Chrome.close_chrome_tab()
+    self.browser.close_chrome_tab()
     # closes webrtc internals tab
-    Chrome.close_chrome_tab()
+    self.browser.close_chrome_tab()
