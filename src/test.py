@@ -5,22 +5,27 @@ from platforms.constants import ELOS, BBB_LOCAL
 import argparse
 
 def infer_vca_from_url(url):
-	host = url.split("//")[-1].split("/")[0].split('?')[0]
+	host = url.split("//")[-1].split("/")[0].split('?')[0].split('.')[0]
 	if ELOS in host:
 		return ELOS
-	else:
+	elif BBB_LOCAL in host:
 		return BBB_LOCAL
+	else:
+		return host
 
 def launch(args):
-	if (infer_vca_from_url(args.url) == ELOS):
+	vca_type = infer_vca_from_url(args.url)
+	if (vca_type == ELOS or 'live' in vca_type):
 		vca = Elos(args)
 	else:
 		vca = BBBLocalServer(args)
 	
 	vca.enter_url()
-	vca.join_as_guest()
-	vca.enter_guest_data()
-	vca.join_meeting()
+	if vca_type == ELOS or vca_type == BBB_LOCAL:
+		#this steps are only needed for non-api links
+		vca.join_as_guest()
+		vca.enter_guest_data()
+		vca.join_meeting()
 	vca.close_audio_modal()
 	vca.share_camera()
 	vca.collect_data()
