@@ -6,6 +6,15 @@ CAP_INTERFACE=$3
 SHAPE_INTERFACE=$4
 TRACE=$5
 
+
+term() {
+	echo ctrl c pressed!
+	tmux kill-session -t 0
+	sudo wondershaper clear $SHAPE_INTERFACE
+	exit
+}
+trap term SIGINT
+
 echo "Reading trace $TRACE"
 
 sleep 1
