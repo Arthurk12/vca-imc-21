@@ -1,1 +1,1 @@
-sudo rm -r webrtc/ captures/ imglog/ .screenshot*.png stats.log
+sudo rm -r webrtc/ captures/ imglog/ .screenshot*.png stats.log *.log.txt
