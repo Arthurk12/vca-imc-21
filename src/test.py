@@ -12,6 +12,9 @@ def infer_vca_from_url(url):
 		return BBB_LOCAL
 	else:
 		return host
+	
+def is_api(url):
+	return 'api' in url
 
 def launch(args):
 	vca_type = infer_vca_from_url(args.url)
@@ -21,7 +24,7 @@ def launch(args):
 		vca = BBBLocalServer(args)
 	
 	vca.enter_url()
-	if vca_type == ELOS or vca_type == BBB_LOCAL:
+	if not is_api(args.url):
 		#this steps are only needed for non-api links
 		vca.join_as_guest()
 		vca.enter_guest_data()
