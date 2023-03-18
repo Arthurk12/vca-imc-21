@@ -5,6 +5,7 @@ TIME=$2
 CAP_INTERFACE=$3
 SHAPE_INTERFACE=$4
 TRACE=$5
+ROUNDS=${6:-5}
 
 
 term() {
@@ -19,7 +20,7 @@ echo "Reading trace $TRACE"
 
 sleep 1
 
-for i in {1..5}
+for i in $(seq 1 $ROUNDS)
 do
 	while IFS= read -r line
 	do
