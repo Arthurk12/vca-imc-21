@@ -2,6 +2,7 @@ from interactor import Interactor
 from browsers.chrome import Chrome
 from subprocess import PIPE, Popen
 from platforms.constants import ELOS
+from config import Config
 import time
 import os
 
@@ -29,7 +30,8 @@ class VCA:
       _ = Popen(f'mkdir captures', shell=True)
 
     filename = f'captures/{self.ts}-{self.vca}-{self.record}.pcap'
-    self.mtr()
+    if Config.get_mtr_enabled():
+      self.mtr()
     cmd = f'tshark -i {self.interface} -w {filename} -a duration:{str(self.duration)}'
     res = Popen(cmd, shell=True)
     res.wait()
@@ -43,7 +45,7 @@ class VCA:
     
     filename = f'mtr/{self.vca}-{self.record}.mtr'
     
-    cmd = f'mtr -w -o"LDRSNBAWVGJMXI" -C -c{str(self.duration)} prober-oci-saopaulo-1.mconf.net > {filename}'
+    cmd = f'mtr -w -o"LDRSNBAWVGJMXI" -C -c{str(self.duration)} {Config.get_mtr_endpoint()} > {filename}'
     _ = Popen(cmd, shell=True)
   
   def collect_webrtc_dump(self):

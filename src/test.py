@@ -2,7 +2,10 @@ from subprocess import PIPE, Popen
 from platforms.elos import Elos
 from platforms.bbb_local_server import BBBLocalServer
 from platforms.constants import ELOS, BBB_LOCAL
+from config import Config
 import argparse
+import time
+import yaml
 
 def infer_vca_from_url(url):
 	host = url.split("//")[-1].split("/")[0].split('?')[0].split('.')[0]
@@ -30,8 +33,10 @@ def launch(args):
 		vca.enter_guest_data()
 		vca.join_meeting()
 	vca.close_audio_modal()
-	vca.share_camera()
+	vca.share_camera(Config.get_video_quality())
 	vca.collect_data()
+	if Config.get_receiver_wait_enabled():
+		time.sleep(Config.get_receiver_wait_time())
 	vca.quit_call()
 
 	del vca
@@ -83,6 +88,13 @@ def build_parser():
 	return parser
 
 
+def load_configs():
+
+	with open('config/config.yml', 'r') as f:
+			data = yaml.load(f, Loader=yaml.FullLoader)
+			print("settings data: ", data['python'])
+			Config.init(data)
+
 def execute():
 
 	parser = build_parser()
@@ -93,6 +105,7 @@ def execute():
 
 if __name__ == '__main__':
 	try:
+		load_configs()
 		execute()
 
 	except Exception as error:

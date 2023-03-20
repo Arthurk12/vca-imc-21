@@ -3,7 +3,10 @@ from platforms.constants import ELOS
 import pyautogui
 import time
 
-LOW_QUALITY, MEDIUM_QUALITY, HIGH_QUALITY, ULTRA_HIGH_QUALITY = range(4)
+LOW_QUALITY = "Low"
+MEDIUM_QUALITY = "Medium"
+HIGH_QUALITY = "High"
+ULTRA_HIGH_QUALITY = "High Definition"
 
 DEFAULT_QUALITY = ULTRA_HIGH_QUALITY
 
@@ -16,6 +19,8 @@ class Elos(VCA):
     pyautogui.hotkey('enter')
 
   def join_as_guest(self):
+    time.sleep(2)
+
     self.guibot_click('elos_sign_in_as_guest.png')
 
   def enter_guest_data(self):

@@ -10,3 +10,22 @@ bash:
   captureInterface: "enp2s0"
   videoFile: "media/test.mp4"
   devVideo: "/dev/video0"
+
+
+python:
+  mtr:
+    enabled: false
+    endpoint: ""
+  # Adds an extra delay before closing chrome
+  # This is intended to be used on experiments
+  # that aim to gather dump webrtc from both sides(sender, receiver)
+  # It gives more time to the one who is running
+  # the experiment to go to the other machine
+  # which will not download the webrtc dump
+  # automatically and do it manually.
+  receiverWait:
+    enabled: false
+    # 10 seconds
+    time: 10000
+  # one of ["Low", "Medium", "High", "High Definition"]
+  videoQuality: "High Definition"
