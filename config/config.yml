@@ -1,0 +1,12 @@
+bash:
+  shaper:
+    # one of ["router", "wondershaper", "shaper"]
+    method: "wondershaper"
+    # only applied when shaper method is "router"
+    router_ip: ""
+    router_user: ""
+    # only applied when shaper method is "wondeshaper" or "shaper"
+    interface: "enp2s0"
+  captureInterface: "enp2s0"
+  videoFile: "media/test.mp4"
+  devVideo: "/dev/video0"

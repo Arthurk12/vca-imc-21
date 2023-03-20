@@ -14,8 +14,8 @@ echo $CMD,$DNLD_RATE,$UPLD_RATE,$LATENCY,$LOSS
 
 # Name of the traffic control command.
 TC=tc
-DNLD=${DNLD_RATE}mbit          # DOWNLOAD Limit
-UPLD=${UPLD_RATE}mbit          # UPLOAD Limit
+DNLD=${DNLD_RATE}kbit          # DOWNLOAD Limit
+UPLD=${UPLD_RATE}kbit          # UPLOAD Limit
 
 start() {
 
