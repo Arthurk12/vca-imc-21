@@ -1,10 +1,14 @@
 bash:
   shaper:
-    # one of ["router", "wondershaper", "shaper"]
-    method: "wondershaper"
+    # one of ["router", "wondershaper", "shaper", "tc_computer"]
+    method: "tc_computer"
     # only applied when shaper method is "router"
     router_ip: ""
     router_user: ""
+    # only applied when shaper method is "tc_computer"
+    computer_ip: ""
+    computer_user: ""
+    computer_password: ""
     # only applied when shaper method is "wondeshaper" or "shaper"
     interface: "enp2s0"
   captureInterface: "enp2s0"

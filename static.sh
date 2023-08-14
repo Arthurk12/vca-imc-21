@@ -26,6 +26,9 @@ eval $(parse_yaml config/config.yml "CONFIG_")
 SHAPER_METHOD=$CONFIG_bash_shaper_method
 ROUTER_IP=$CONFIG_bash_shaper_router_ip
 ROUTER_USER=$CONFIG_bash_shaper_router_user
+COMPUTER_IP=$CONFIG_bash_shaper_computer_ip
+COMPUTER_USER=$CONFIG_bash_shaper_computer_user
+COMPUTER_PASSWORD=$CONFIG_bash_shaper_computer_password
 SHAPER_INTERFACE=$CONFIG_bash_shaper_interface
 CAP_INTERFACE=$CONFIG_bash_captureInterface
 VIDEO_FILE=$CONFIG_bash_videoFile
@@ -48,6 +51,13 @@ shape() {
 					tc)
 						./shaper.sh start $2 $3 0 0 $SHAPER_INTERFACE
 						;;
+
+          tc_computer)
+            ssh -t $COMPUTER_USER@$COMPUTER_IP << EOF
+  echo "$COMPUTER_PASSWORD" | sudo -S whoami
+  echo "$COMPUTER_PASSWORD" | sudo ./netspeed.sh -l ${2}kbit
+EOF
+            ;;
 				*)
 				esac
 				echo "shaping started"
@@ -67,6 +77,13 @@ shape() {
 				tc)
 					./shaper.sh stop 0 0 0 0 $SHAPER_INTERFACE
 					;;
+
+        tc_computer)
+          ssh -t $COMPUTER_USER@$COMPUTER_IP << EOF
+  echo "$COMPUTER_PASSWORD" | sudo -S whoami
+  echo "$COMPUTER_PASSWORD" | sudo ./netspeed.sh -s
+EOF
+          ;;
 			*)
 			esac
 			echo "shaping started"
@@ -88,6 +105,8 @@ echo "---Starting experiment with below config values--"
 echo "Shaper method:" $SHAPER_METHOD
 echo "Router Ip:" $ROUTER_IP
 echo "Router User:" $ROUTER_USER
+echo "Computer Ip:" $COMPUTER_IP
+echo "Computer User:" $COMPUTER_USER
 echo "Shaper Interface:" $SHAPER_INTERFACE
 echo "Capture Interface:" $CAP_INTERFACE
 echo "Video File:" $VIDEO_FILE
