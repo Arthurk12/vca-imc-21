@@ -104,8 +104,10 @@ do
 	do
 		a=( $line )
 		echo "Setting ${a[0]} down and ${a[1]} up"
-    if [ ${a[0]} -ne "0" ] && [ ${a[1]} -ne "0" ]; then
+    if [ "${a[0]}" != "0" ] && [ "${a[1]}" != "0" ]; then
 			shape start ${a[0]} ${a[1]}
+    else
+     echo "no constraints will be applied"
     fi
     tmux new -d "ffmpeg -stream_loop -1 -re -i ${VIDEO_FILE} -vcodec rawvideo -threads 0 -f v4l2 ${DEV_VIDEO}"
 		python3 src/test.py -u $URL $TIME -i $CAP_INTERFACE -d ${a[0]} -p ${a[1]} -c $i
@@ -113,10 +115,11 @@ do
 		echo $ret
     tmux kill-session -t 0
 		sleep 1
-    if [ ${a[0]} -ne "0" ] && [ ${a[1]} -ne "0" ]; then
+    if [ "${a[0]}" != "0" ] && [ "${a[1]}" != "0" ]; then
 			shape stop
     fi
 		if [ $ret -ne 0 ]; then
+      echo "Exiting because something went wrong: $ret"
 			exit 5
 		fi
 		
