@@ -90,7 +90,7 @@ class VCA:
     self.duration = args.duration
     self.timeout = VCA.calculate_timeout(args.download)
     self.interactor = Interactor()
-    self.browser = Chrome(self.record, True, False)
+    self.browser = Chrome(self.record, False, False)
     self.browser.open()
     self.browser.open_webrtc_internals()
     self.browser.open_new_tab()
