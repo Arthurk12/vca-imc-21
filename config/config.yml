@@ -31,5 +31,9 @@ python:
     enabled: false
     # 10 seconds
     time: 10000
+  notify:
+    enabled: false
+    destination: ""
+    port: 12345
   # one of ["Low", "Medium", "High", "High Definition"]
   videoQuality: "High Definition"
