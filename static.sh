@@ -93,6 +93,17 @@ EOF
 
 }
 
+load_v4l2loopback() {
+  MODULE="v4l2loopback"
+
+  if lsmod | grep -wq "$MODULE"; then
+    echo "$MODULE is loaded!"
+  else
+    echo "$MODULE is not loaded!"
+    sudo modprobe v4l2loopback card_label="My Fake Webcam" exclusive_caps=1
+  fi
+}
+
 term() {
 	echo ctrl c pressed!
 	tmux kill-session -t 0
@@ -112,6 +123,8 @@ echo "Capture Interface:" $CAP_INTERFACE
 echo "Video File:" $VIDEO_FILE
 echo "Dev video:" $DEV_VIDEO
 echo "--------------------------------------------------"
+
+load_v4l2loopback
 
 echo "Reading trace $TRACE"
 
