@@ -40,7 +40,7 @@ def launch(args):
 		time.sleep(Config.get_receiver_wait_time())
 	elif Config.get_notify_enabled():
 		coordinator = Coordinator(Config.get_notify_destination(), Config.get_notify_port())
-		coordinator.notify('#quit')
+		coordinator.notify(vca.create_webrtc_filename())
 	vca.quit_call()
 
 	del vca
