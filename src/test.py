@@ -3,6 +3,7 @@ from platforms.elos import Elos
 from platforms.bbb_local_server import BBBLocalServer
 from platforms.constants import ELOS, BBB_LOCAL
 from config import Config
+from coordinator import Coordinator
 import argparse
 import time
 import yaml
@@ -37,6 +38,9 @@ def launch(args):
 	vca.collect_data()
 	if Config.get_receiver_wait_enabled():
 		time.sleep(Config.get_receiver_wait_time())
+	elif Config.get_notify_enabled():
+		coordinator = Coordinator(Config.get_notify_destination(), Config.get_notify_port())
+		coordinator.notify('#quit')
 	vca.quit_call()
 
 	del vca
