@@ -65,6 +65,13 @@ class VCA:
     res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{self.vca}-{self.record.split("r")[0]}[{self.counter}].json', 
       shell=True)
 
+
+    if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/videos'):
+      res = Popen(f'mkdir videos', shell=True)
+
+    res = Popen(f'mv ~/Videos/*.webm videos/{self.vca}-{self.record.split("r")[0]}[{self.counter}].webm', 
+      shell=True)
+
     printheader = VCA.is_file_empty(os.path.abspath(os.getcwd())+'/stats.log')
 
     with open('stats.log', 'a') as f:
