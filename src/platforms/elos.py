@@ -35,9 +35,8 @@ class Elos(VCA):
     pyautogui.hotkey('enter')
   
   def join_meeting(self):
-    time.sleep(3)
-    pyautogui.hotkey('enter')
-  
+    self.guibot_click('elos_join_meeting.png')
+
   def join_microphone(self):
     time.sleep(3)
 
