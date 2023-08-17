@@ -5,6 +5,7 @@ from platforms.constants import ELOS
 from config import Config
 import time
 import os
+import pyautogui
 
 class VCA:
 
@@ -52,6 +53,7 @@ class VCA:
     _ = Popen(cmd, shell=True)
   
   def collect_webrtc_dump(self):
+    pyautogui.hotkey('ctrl', 'shift', 'alt', 'r')
     self.guibot_click('create_dump.png')
     self.guibot_click('download.png')
 
@@ -97,6 +99,7 @@ class VCA:
     self.browser.open()
     self.browser.open_webrtc_internals()
     self.browser.open_new_tab()
+    pyautogui.hotkey('ctrl', 'shift', 'alt', 'r')
   
   def __del__(self):
     # closes vca tab
