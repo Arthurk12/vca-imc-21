@@ -28,7 +28,6 @@ ROUTER_IP=$CONFIG_bash_shaper_router_ip
 ROUTER_USER=$CONFIG_bash_shaper_router_user
 COMPUTER_IP=$CONFIG_bash_shaper_computer_ip
 COMPUTER_USER=$CONFIG_bash_shaper_computer_user
-COMPUTER_PASSWORD=$CONFIG_bash_shaper_computer_password
 SHAPER_INTERFACE=$CONFIG_bash_shaper_interface
 CAP_INTERFACE=$CONFIG_bash_captureInterface
 VIDEO_FILE=$CONFIG_bash_videoFile
@@ -53,10 +52,7 @@ shape() {
 						;;
 
           tc_computer)
-            ssh -t $COMPUTER_USER@$COMPUTER_IP << EOF
-  echo "$COMPUTER_PASSWORD" | sudo -S whoami
-  echo "$COMPUTER_PASSWORD" | sudo ./netspeed.sh -l ${2}kbit
-EOF
+            ssh -n $COMPUTER_USER@$COMPUTER_IP "sudo ./netspeed.sh -l ${2}kbit"
             ;;
 				*)
 				esac
@@ -79,10 +75,7 @@ EOF
 					;;
 
         tc_computer)
-          ssh -t $COMPUTER_USER@$COMPUTER_IP << EOF
-  echo "$COMPUTER_PASSWORD" | sudo -S whoami
-  echo "$COMPUTER_PASSWORD" | sudo ./netspeed.sh -s
-EOF
+          ssh -n $COMPUTER_USER@$COMPUTER_IP "sudo ./netspeed.sh -s"
           ;;
 			*)
 			esac

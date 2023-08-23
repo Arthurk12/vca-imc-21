@@ -8,7 +8,6 @@ bash:
     # only applied when shaper method is "tc_computer"
     computer_ip: ""
     computer_user: ""
-    computer_password: ""
     # only applied when shaper method is "wondeshaper" or "shaper"
     interface: "enp2s0"
   captureInterface: "enp2s0"
