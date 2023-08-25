@@ -14,10 +14,6 @@ class Elos(VCA):
   def __init__(self, args, vca=ELOS):
     super().__init__(args, vca)
 
-  def enter_url(self):
-    pyautogui.write(self.url)
-    pyautogui.hotkey('enter')
-
   def join_as_guest(self):
     time.sleep(2)
 

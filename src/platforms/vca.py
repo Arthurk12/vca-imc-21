@@ -11,6 +11,10 @@ class VCA:
 
   DEFAULT_TIMEOUT = 20
 
+  def enter_url(self):
+    pyautogui.write(self.url)
+    pyautogui.hotkey('enter')
+
   def create_record(self, args):
     return f'{args.download}-{args.upload}r{args.counter}';
 

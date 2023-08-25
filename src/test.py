@@ -1,7 +1,8 @@
 from subprocess import PIPE, Popen
 from platforms.elos import Elos
 from platforms.bbb_local_server import BBBLocalServer
-from platforms.constants import ELOS, BBB_LOCAL
+from platforms.meet import Meet
+from platforms.constants import ELOS, BBB_LOCAL, MEET
 from config import Config
 from coordinator import Coordinator
 import argparse
@@ -14,6 +15,8 @@ def infer_vca_from_url(url):
 		return ELOS
 	elif BBB_LOCAL in host:
 		return BBB_LOCAL
+	elif MEET in host:
+		return MEET
 	else:
 		return host
 	
@@ -24,6 +27,8 @@ def launch(args):
 	vca_type = infer_vca_from_url(args.url)
 	if (vca_type == ELOS or 'live' in vca_type):
 		vca = Elos(args)
+	elif (vca_type == MEET):
+		vca = Meet(args)
 	else:
 		vca = BBBLocalServer(args)
 	
