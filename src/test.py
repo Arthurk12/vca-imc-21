@@ -48,7 +48,7 @@ def launch(args):
 		time.sleep(Config.get_receiver_wait_time())
 	elif Config.get_notify_enabled():
 		coordinator = Coordinator(Config.get_notify_destination(), Config.get_notify_port())
-		coordinator.notify(vca.create_webrtc_filename())
+		coordinator.notify('#'.join(['end',args.experiment,vca.create_webrtc_filename()]))
 	vca.quit_call()
 
 	del vca
@@ -88,6 +88,13 @@ def build_parser():
 		default=None,
 		action='store',
 		help='Interface to capture network traffic'
+	)
+	
+	parser.add_argument(
+		'-e', '--experiment',
+		default=None,
+		action='store',
+		help='Name of the experiment'
 	)
 
 	parser.add_argument(

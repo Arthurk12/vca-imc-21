@@ -3,7 +3,8 @@
 URL=$1
 TIME=$2
 TRACE=$3
-ROUNDS=${4:-5}
+EXPERIMENT_NAME=$4
+ROUNDS=${5:-5}
 
 parse_yaml() {
     local prefix=$2
@@ -105,7 +106,7 @@ term() {
 }
 trap term SIGINT
 
-echo "---Starting experiment with below config values--"
+echo "---Starting experiment $EXPERIMENT_NAME with below config values--"
 echo "Shaper method:" $SHAPER_METHOD
 echo "Router Ip:" $ROUTER_IP
 echo "Router User:" $ROUTER_USER
@@ -115,7 +116,7 @@ echo "Shaper Interface:" $SHAPER_INTERFACE
 echo "Capture Interface:" $CAP_INTERFACE
 echo "Video File:" $VIDEO_FILE
 echo "Dev video:" $DEV_VIDEO
-echo "--------------------------------------------------"
+echo "-------------------------------------------------------------------"
 
 load_v4l2loopback
 
@@ -135,7 +136,7 @@ do
      echo "no constraints will be applied"
     fi
     tmux new -d "ffmpeg -stream_loop -1 -re -i ${VIDEO_FILE} -vcodec rawvideo -threads 0 -f v4l2 ${DEV_VIDEO}"
-		python3 src/test.py -u $URL $TIME -i $CAP_INTERFACE -d ${a[0]} -p ${a[1]} -c $i
+		python3 src/test.py -u $URL $TIME -i $CAP_INTERFACE -d ${a[0]} -p ${a[1]} -e $EXPERIMENT_NAME -c $i
 		ret=$?
 		echo $ret
     tmux kill-session -t 0

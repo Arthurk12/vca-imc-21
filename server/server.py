@@ -2,14 +2,15 @@ import socket
 import time
 import os
 import pyautogui
-from subprocess import PIPE, Popen
 from browsers.chrome import Chrome
 from interactor import Interactor
+from results_manager import ResultsManager
 
 HOST = ''
 PORT = 12345
 chrome = Chrome('', False, False)
 interactor = Interactor()
+has_started = False
 
 def file_or_directory_exists(path):
   return os.path.exists(path)
@@ -26,24 +27,36 @@ def initial_actions():
   interactor.guibot_cliick('create_dump.png', 20)
   chrome.open_new_tab()
 
-def start_experiment_routine():
+def start_round_routine():
+  global has_started
+  if has_started:
+    print('Received experiment start message when experiment has already started!')
+    pass
+
+  has_started = True
+  # To reset the webRTC dump
+  # chrome.refresh_tab()
+
   toggle_recording()
 
-def end_experiment_routine(record_name):
+def end_round_routine(experiment_name, record_name):
+  global has_started
+  if not has_started:
+    print('Received experiment end message when experiment has already ended!')
+    pass
+
+  has_started = False
   toggle_recording()
   chrome.switch_tab()
   time.sleep(1)
   interactor.guibot_cliick('download.png', 20)
   time.sleep(2)
 
-  if not file_or_directory_exists(os.path.abspath(os.getcwd())+'/webrtc_server'):
-    res = Popen(f'mkdir webrtc_server', shell=True)
+  results_manager = ResultsManager(experiment_name+'_server')
+  results_manager.move_webrtc_dump(record_name)
+  results_manager.move_video(record_name)
 
-  res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc_server/{record_name}.json', 
-    shell=True)
   chrome.switch_tab()
-  # To reset the webRTC dump
-  chrome.refresh_tab()
 
 
 initial_actions()
@@ -61,11 +74,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         break
       received_message = data.decode()
       print(f"received message => {received_message}")
-      if 'start' in received_message:
-        start_experiment_routine()
+      arguments = received_message.split('#')
+      if arguments[0] == 'start':
+        start_round_routine()
+      elif arguments[0] == 'end':
+        experiment_name = arguments[1]
+        record_name = arguments[2]
+        end_round_routine(experiment_name, record_name)
       else:
-        record_name = received_message
-        end_experiment_routine(record_name)
+        print('received unknown message')
       conn.sendall(data)
   time.sleep(1)
   s.close()
