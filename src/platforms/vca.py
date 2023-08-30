@@ -2,6 +2,7 @@ from interactor import Interactor
 from browsers.chrome import Chrome
 from subprocess import PIPE, Popen
 from platforms.constants import ELOS
+from results_manager import ResultsManager
 from config import Config
 import time
 import os
@@ -27,17 +28,14 @@ class VCA:
   def get_time(self):
     self.ts = int(time.time())
 
-  def file_or_directory_exists(path):
-    return os.path.exists(path)
-
   def is_file_empty(file_path):
     return (not os.path.exists(file_path))
   
   def capture_traffic(self):
-    if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/captures'):
-      _ = Popen(f'mkdir captures', shell=True)
+    # if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/captures'):
+    #   _ = Popen(f'mkdir captures', shell=True)
 
-    filename = f'captures/{self.ts}-{self.vca}-{self.record}.pcap'
+    filename = self.results_manager.get_captures_path_file(f'{self.ts}-{self.vca}-{self.record}')
     if Config.get_mtr_enabled():
       self.mtr()
     cmd = f'tshark -i {self.interface} -w {filename} -a duration:{str(self.duration)}'
@@ -48,10 +46,7 @@ class VCA:
     if ELOS not in self.vca:
       return
 
-    if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/mtr'):
-      _ = Popen(f'mkdir mtr', shell=True)
-    
-    filename = f'mtr/{self.vca}-{self.record}.mtr'
+    filename = self.results_manager.get_mtr_path_file('{self.vca}-{self.record}')
     
     cmd = f'mtr -w -o"LDRSNBAWVGJMXI" -C -c{str(self.duration)} {Config.get_mtr_endpoint()} > {filename}'
     _ = Popen(cmd, shell=True)
@@ -63,18 +58,21 @@ class VCA:
 
     time.sleep(2)
 
-    if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/webrtc'):
-      res = Popen(f'mkdir webrtc', shell=True)
+    self.results_manager.move_webrtc_dump(self.create_webrtc_filename())
 
-    res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{self.vca}-{self.record.split("r")[0]}[{self.counter}].json', 
-      shell=True)
+    # if not VCA.file_or_directory_exists():
+    #   res = Popen(f'mkdir webrtc', shell=True)
 
+    # res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc/{self.vca}-{self.record.split("r")[0]}[{self.counter}].json', 
+    #   shell=True)
 
-    if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/videos'):
-      res = Popen(f'mkdir videos', shell=True)
+    self.results_manager.move_video(self.create_webrtc_filename())
 
-    res = Popen(f'mv ~/Videos/*.webm videos/{self.vca}-{self.record.split("r")[0]}[{self.counter}].webm', 
-      shell=True)
+    # if not VCA.file_or_directory_exists(os.path.abspath(os.getcwd())+'/videos'):
+    #   res = Popen(f'mkdir videos', shell=True)
+
+    # res = Popen(f'mv ~/Videos/*.webm videos/{self.vca}-{self.record.split("r")[0]}[{self.counter}].webm', 
+    #   shell=True)
 
     printheader = VCA.is_file_empty(os.path.abspath(os.getcwd())+'/stats.log')
 
@@ -105,6 +103,7 @@ class VCA:
     self.vca = vca
     self.duration = args.duration
     self.timeout = VCA.calculate_timeout(args.download)
+    self.results_manager = ResultsManager(args.experiment)
     self.interactor = Interactor()
     self.browser = Chrome(self.record, False, False)
     self.browser.open()
