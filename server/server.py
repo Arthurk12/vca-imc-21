@@ -25,9 +25,12 @@ def initial_actions():
   chrome.open_webrtc_internals()
   interactor.guibot_cliick('create_dump.png', 20)
   chrome.open_new_tab()
+
+def start_experiment_routine():
   toggle_recording()
 
-def perform_actions(record_name):
+def end_experiment_routine(record_name):
+  toggle_recording()
   chrome.switch_tab()
   time.sleep(1)
   interactor.guibot_cliick('download.png', 20)
@@ -39,7 +42,8 @@ def perform_actions(record_name):
   res = Popen(f'mv ~/Downloads/webrtc_internals_dump.txt webrtc_server/{record_name}.json', 
     shell=True)
   chrome.switch_tab()
-  toggle_recording()
+  # To reset the webRTC dump
+  chrome.refresh_tab()
 
 
 initial_actions()
@@ -55,9 +59,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
       data = conn.recv(1024)
       if not data:
         break
-      record_name = data.decode()
-      print(f"received record name {record_name}")
-      perform_actions(record_name)
+      received_message = data.decode()
+      print(f"received message => {received_message}")
+      if 'start' in received_message:
+        start_experiment_routine()
+      else:
+        record_name = received_message
+        end_experiment_routine(record_name)
       conn.sendall(data)
   time.sleep(1)
   s.close()

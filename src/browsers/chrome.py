@@ -24,6 +24,10 @@ class Chrome:
     time.sleep(0.25)
     pyautogui.hotkey('ctrl', 'w')
 
+  def refresh_tab(self):
+    time.sleep(0.25)
+    pyautogui.hotkey('f5')
+
   def __init__(self, record, logsEnabled, fakeDevice):
     self.openGoogleCommand = 'google-chrome --check-permission'
     if fakeDevice:
