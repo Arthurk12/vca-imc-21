@@ -27,7 +27,34 @@ def initial_actions():
   interactor.guibot_cliick('create_dump.png', 20)
   chrome.open_new_tab()
 
-def start_round_routine():
+def elos_setup():
+  time.sleep(3)
+  #confirm page reload
+  pyautogui.hotkey('enter')
+  #wait for the page to load
+  time.sleep(10)
+  #close audio modal
+  interactor.guibot_cliick('close_audio_modal.png', 20)
+  #open camera modal
+  interactor.guibot_cliick('elos_camera_open_modal.png', 20)
+  #wait for the modal to load
+  time.sleep(5)
+  #9 tabs til "share camera" is selected
+  for i in range(9):
+    pyautogui.hotkey('tab')
+    time.sleep(0.05)
+  #click "share camera"
+  pyautogui.hotkey('enter')
+
+def meet_setup():
+  #wait for the page to load
+  time.sleep(10)
+  #mute microphone
+  interactor.guibot_cliick('meet_mute_mic.png', 20)
+  #click to join
+  interactor.guibot_cliick('meet_join_now.png', 20)
+
+def start_round_routine(conference_link):
   global has_started
   if has_started:
     print('Received experiment start message when experiment has already started!')
@@ -35,7 +62,13 @@ def start_round_routine():
 
   has_started = True
   # To reset the webRTC dump
-  # chrome.refresh_tab()
+  chrome.refresh_tab()
+  if 'live' in conference_link or 'elos' in conference_link:
+    elos_setup()
+  elif 'meet' in conference_link:
+    meet_setup()
+  else:
+    print(f'Unknown VCA: {conference_link}')
 
   toggle_recording()
 
@@ -76,7 +109,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
       print(f"received message => {received_message}")
       arguments = received_message.split('#')
       if arguments[0] == 'start':
-        start_round_routine()
+        conference_link = arguments[1]
+        start_round_routine(conference_link)
       elif arguments[0] == 'end':
         experiment_name = arguments[1]
         record_name = arguments[2]

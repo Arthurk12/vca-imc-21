@@ -35,7 +35,7 @@ def launch(args):
 	vca.enter_url()
 	if Config.get_notify_enabled():
 		coordinator = Coordinator(Config.get_notify_destination(), Config.get_notify_port())
-		coordinator.notify('start')
+		coordinator.notify('#'.join(['start', args.url]))
 	if not is_api(args.url):
 		#this steps are only needed for non-api links
 		vca.join_as_guest()
