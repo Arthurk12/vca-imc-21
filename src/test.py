@@ -33,14 +33,14 @@ def launch(args):
 		vca = BBBLocalServer(args)
 	
 	vca.enter_url()
+	if Config.get_notify_enabled():
+		coordinator = Coordinator(Config.get_notify_destination(), Config.get_notify_port())
+		coordinator.notify('start')
 	if not is_api(args.url):
 		#this steps are only needed for non-api links
 		vca.join_as_guest()
 		vca.enter_guest_data()
 		vca.join_meeting()
-	if Config.get_notify_enabled():
-		coordinator = Coordinator(Config.get_notify_destination(), Config.get_notify_port())
-		coordinator.notify('start')
 	vca.close_audio_modal()
 	vca.share_camera(Config.get_video_quality())
 	vca.collect_data()
