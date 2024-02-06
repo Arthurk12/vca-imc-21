@@ -72,9 +72,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
       command = arguments[0]
       duration = int(float(arguments[1]))
       if command == 'start':
+        conn.sendall(data)
         startShaping(duration)
       else:
         print('received unknown message')
-      conn.sendall(data)
   time.sleep(1)
   s.close()
