@@ -32,6 +32,7 @@ def clear_bandwidth_constraints():
   subprocess.run(clear_constraints_command, shell=True)
 
 def startShaping(max_seconds):
+  global seconds_counter
   # Abre o arquivo CSV
   with open(csv_trace, "r") as csvfile:
     reader = csv.reader(csvfile, delimiter=",")
@@ -69,7 +70,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
       print(f'received message => {received_message}')
       arguments = received_message.split('#')
       command = arguments[0]
-      duration = arguments[1]
+      duration = int(float(arguments[1]))
       if command == 'start':
         startShaping(duration)
       else:
