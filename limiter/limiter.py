@@ -6,7 +6,7 @@ import time
 import socket
 
 HOST = ''
-PORT = 66666
+PORT = 6666
 
 last_applied_constraint = None
 seconds_counter = 0

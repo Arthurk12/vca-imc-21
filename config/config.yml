@@ -18,7 +18,7 @@ app:
     port: 12345
   shaper:
     endpoint: ''
-    port: 66666
+    port: 6666
   tools:
     virtualCamera:
       videoFile: 'media/test.mp4'
