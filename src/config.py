@@ -27,10 +27,10 @@ class Config:
   def get_virtual_camera_dev_video():
     return Config.configs['tools']['virtualCamera']['devVideo']
   
-  def get_machine_shaper_endpoint():
+  def get_shaper_machine_endpoint():
     return Config.configs['shaper']['endpoint']
 
-  def get_machine_shaper_port():
+  def get_shaper_machine_port():
     return Config.configs['shaper']['port']
   
   def get_notify_port():
