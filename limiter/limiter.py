@@ -1,15 +1,21 @@
 ## TODO: add readme to this folder explaining how to configure it(shaped interface, scripts)
+import sys
 import csv
 import subprocess
 import time
 import socket
 
-CSV_TRACE = ''
 HOST = ''
-PORT = 12345
+PORT = 66666
 
 last_applied_constraint = None
 seconds_counter = 0
+
+if len(sys.argv) < 2 or sys.argv[1] == '-h':
+  sys.stdout.write("Usage: %s <trace.csv> \n"%sys.argv[0])
+  sys.exit(0)
+
+csv_trace = sys.argv[1]
 
 def apply_bandwidth_constraint(constraint_in_bytes_per_second):
   global last_applied_constraint
@@ -27,7 +33,7 @@ def clear_bandwidth_constraints():
 
 def startShaping(max_seconds):
   # Abre o arquivo CSV
-  with open(CSV_TRACE, "r") as csvfile:
+  with open(csv_trace, "r") as csvfile:
     reader = csv.reader(csvfile, delimiter=",")
     next(reader)
 
@@ -50,6 +56,7 @@ def startShaping(max_seconds):
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
   s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
   s.bind((HOST, PORT))
+  print(f'Listening on {HOST} port {PORT}')
   while True:
     s.listen()
     conn, addr = s.accept()
