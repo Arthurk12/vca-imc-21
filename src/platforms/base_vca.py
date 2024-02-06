@@ -15,6 +15,7 @@ class base_VCA:
 
   def __init__(self, args, round, vca):
     logger.debug(f'{LOG_PREFIX} Constructor')
+    self.interface = args.interface
     self.round = round
     self.url = args.url
     self.vca = vca

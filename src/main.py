@@ -79,6 +79,13 @@ def build_parser():
 		'duration',
 		help='Length of each call'
 	)
+
+	parser.add_argument(
+		'-i', '--interface',
+		default=None,
+		action='store',
+		help='Interface to capture network traffic'
+	)
 	
 	parser.add_argument(
 		'-e', '--experiment',
