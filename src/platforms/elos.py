@@ -1,5 +1,8 @@
-from platforms.vca import VCA
+from subprocess import Popen
+from platforms.base_vca import base_VCA
 from platforms.constants import ELOS
+from config import Config
+from logger import logger
 import pyautogui
 import time
 
@@ -10,16 +13,49 @@ ULTRA_HIGH_QUALITY = "High Definition"
 
 DEFAULT_QUALITY = ULTRA_HIGH_QUALITY
 
-class Elos(VCA):
-  def __init__(self, args, vca=ELOS):
-    super().__init__(args, vca)
+LOG_PREFIX = '[ELOS]'
 
+class Elos(base_VCA):
+  def __init__(self, args, round, vca=ELOS):
+    logger.debug(f'{LOG_PREFIX} Constructor')
+    super().__init__(args, round, vca)
+    self.is_api = 'api' in self.url
+    self.is_elos = vca == ELOS
+
+  def pre_join_actions(self):
+    if not self.is_api:    
+      logger.debug(f'{LOG_PREFIX} Is not API. Pre-join actions')
+      self.join_as_guest()
+      self.enter_guest_data()
+    else:
+      logger.debug(f'{LOG_PREFIX} Is API. No pre-join actions. Passing.')
+
+  def join_meeting(self):
+    logger.debug(f'{LOG_PREFIX} Pre-join actions')
+    if not self.is_api:
+      time.sleep(1)
+      pyautogui.hotkey('enter')
+      # self.guibot_click('elos_join_meeting.png')
+  
+  def pos_join_actions(self):
+    logger.debug(f'{LOG_PREFIX} Pos-join actions')
+    if Config.get_elos_join_microphone():
+      self.join_microphone()
+    else:
+      self.close_audio_modal()
+  
+  def share_camera(self):
+    logger.debug(f'{LOG_PREFIX} Sharing camera with quality: {Config.get_elos_video_quality()}')
+    self._share_camera(Config.get_elos_video_quality())
+  
   def join_as_guest(self):
+    logger.debug(f'{LOG_PREFIX} Joining as guest')
     time.sleep(2)
 
     self.guibot_click('elos_sign_in_as_guest.png')
 
   def enter_guest_data(self):
+    logger.debug(f'{LOG_PREFIX} Entering guest data')
     time.sleep(2)
 
     pyautogui.write(self.record)
@@ -29,11 +65,9 @@ class Elos(VCA):
     pyautogui.write(self.record+'@test.com')
 
     pyautogui.hotkey('enter')
-  
-  def join_meeting(self):
-    self.guibot_click('elos_join_meeting.png')
 
   def join_microphone(self):
+    logger.debug(f'{LOG_PREFIX} Joining microphone')
     time.sleep(3)
 
     self.guibot_click('elos_join_microphone.png')
@@ -41,28 +75,31 @@ class Elos(VCA):
     self.guibot_click('elos_activate_audio_echo_test.png')
   
   def close_audio_modal(self):
+    logger.debug(f'{LOG_PREFIX} Closing audio modal')
     time.sleep(3)
 
     self.guibot_click('close_audio_modal.png')
   
   def low_quality():
+    logger.debug(f'{LOG_PREFIX} Selecting low quality camera profile')
     pyautogui.hotkey('enter')
     pyautogui.hotkey('up')
     pyautogui.hotkey('enter')
     time.sleep(3)
 
   def medium_quaity():
-    # Do nothing
-    # Put a time sleep here, just because a function can't be empty in python
-    time.sleep(0.01)
+    logger.debug(f'{LOG_PREFIX} Selecting medium quality camera profile')
+    pass
   
   def high_quality():
+    logger.debug(f'{LOG_PREFIX} Selecting high quality camera profile')
     pyautogui.hotkey('enter')
     pyautogui.hotkey('down')
     pyautogui.hotkey('enter')
     time.sleep(3)
   
   def ultra_high_quality():
+    logger.debug(f'{LOG_PREFIX} Selecting ultra high quality camera profile')
     pyautogui.hotkey('enter')
     for i in range(2):
       pyautogui.hotkey('down')
@@ -70,7 +107,7 @@ class Elos(VCA):
     pyautogui.hotkey('enter')
     time.sleep(3)
 
-  def share_camera(self, quality = DEFAULT_QUALITY):
+  def _share_camera(self, quality = DEFAULT_QUALITY):
     time.sleep(2)
 
     self.guibot_click('elos_camera_open_modal.png')
@@ -102,9 +139,28 @@ class Elos(VCA):
       time.sleep(0.05)
     pyautogui.hotkey('enter')
 
-  def quit_call(self):
+  def collect_data(self):
+    logger.debug(f'{LOG_PREFIX} Starting data collection')
+    if self.is_elos and Config.get_elos_mtr_enabled():
+      self.mtr()
+    
+    super().collect_data()
+
+  def mtr(self):
+    logger.debug(f'{LOG_PREFIX} Starting mtr test to endpoint {Config.get_elos_mtr_endpoint()}')
+
+    filename = self.results_manager.get_mtr_path_file('{self.vca}-{self.record}')
+    
+    cmd = f'mtr -w -o"LDRSNBAWVGJMXI" -C -c{str(self.duration)} {Config.get_elos_mtr_endpoint()} > {filename}'
+    _ = Popen(cmd, shell=True)
+
+  def open_right_corner_three_dots(self) -> bool:
     # hotkey for opening the three dots dropdown on the top right corner
     pyautogui.hotkey('alt', 'shift', 'O')
+
+  def quit_call(self):
+    logger.debug(f'{LOG_PREFIX} Quitting call')
+    self.open_right_corner_three_dots()
     for x in range(7):
       pyautogui.hotkey('down')
     pyautogui.hotkey('enter')
