@@ -8,12 +8,13 @@ import argparse
 import time
 import yaml
 from logger import logger
+from beepy import beep
 
 CONFIG_YML = 'config/config.yml'
 LOG_PREFIX = '[MAIN]'
 
 
-def run(args, round, virtual_camera):
+def run(args, round):
 	logger.debug(f'{LOG_PREFIX} -------- Round {round} --------')
 	ivca = Factory_vca.create_vca(args, round)
 	ivca.set_browser(Chrome())
@@ -123,9 +124,13 @@ def execute():
 	for round in range(1, total_rounds, 1):
 		virtual_camera = VirtualCamera()
 		virtual_camera.start_virtual_camera()
-		run(args, round, virtual_camera)
+		run(args, round)
 		virtual_camera.stop_virtual_camera()
 		time.sleep(1)
+
+def play_sound(number):
+	if Config.get_sounds_enabled():
+		beep(sound=number)
 
 
 if __name__ == '__main__':
@@ -133,8 +138,10 @@ if __name__ == '__main__':
 		logger.debug(f'{LOG_PREFIX} Script startup')
 		load_configs()
 		execute()
+		play_sound(6)
 
 	except Exception as error:
+		play_sound(3)
 		logger.error(error)
 		Chrome.quit()
 		quit(-1)

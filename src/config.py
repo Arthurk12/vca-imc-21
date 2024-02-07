@@ -6,6 +6,9 @@ class Config:
   def init(settings):
     Config.configs = settings[Config.selector]
   
+  def get_sounds_enabled():
+    return Config.configs['sounds']['enabled']
+  
   def get_log_level():
     return Config.confis['logging']['level']
 

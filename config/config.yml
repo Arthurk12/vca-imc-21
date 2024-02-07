@@ -1,4 +1,6 @@
 app:
+  sounds:
+    enabled: true
   logging:
     level: INFO
   # Adds an extra delay before closing chrome
