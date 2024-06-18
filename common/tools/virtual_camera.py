@@ -1,6 +1,6 @@
 import subprocess
-from logger import logger
-from config import Config
+from common.logger import logger
+from common.config import Config
 
 LOG_PREFIX = '[VIRTUAL_CAMERA]'
 

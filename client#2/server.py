@@ -2,14 +2,19 @@ import socket
 import time
 import os
 import pyautogui
-from browsers.chrome import Chrome
-from interactor import Interactor
-from results_manager import ResultsManager
+import yaml
+from common.config import Config
+from common.browsers.chrome import Chrome
+from common.interactor import Interactor
+from common.results_manager import ResultsManager
+
+LOG_PREFIX = '[SERVER]'
+CONFIG_YML = 'config/config.yml'
 
 HOST = ''
 PORT = 12345
-chrome = Chrome('', False, False)
-interactor = Interactor()
+chrome = None
+interactor = None
 has_started = False
 
 def file_or_directory_exists(path):
@@ -21,7 +26,16 @@ def is_file_empty(file_path):
 def toggle_recording():
   pyautogui.hotkey('ctrl', 'shift', 'alt', 'r')
 
+def load_configs():
+  with open(CONFIG_YML, 'r') as f:
+    data = yaml.load(f, Loader=yaml.FullLoader)
+    Config.init(data)
+
 def initial_actions():
+  load_configs()
+
+  chrome = Chrome()
+  interactor = Interactor()
   chrome.open()
   chrome.open_webrtc_internals()
   interactor.guibot_cliick('create_dump.png', 20)
@@ -92,31 +106,34 @@ def end_round_routine(experiment_name, record_name):
   chrome.switch_tab()
 
 
-initial_actions()
+def start():
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((HOST, PORT))
+    while True:
+      s.listen()
+      conn, addr = s.accept()
+      with conn:
+        print(f"connected by {addr}")
+        data = conn.recv(1024)
+        if not data:
+          break
+        received_message = data.decode()
+        print(f"received message => {received_message}")
+        arguments = received_message.split('#')
+        if arguments[0] == 'start':
+          conference_link = arguments[1]
+          start_round_routine(conference_link)
+        elif arguments[0] == 'end':
+          experiment_name = arguments[1]
+          record_name = arguments[2]
+          end_round_routine(experiment_name, record_name)
+        else:
+          print('received unknown message')
+        conn.sendall(data)
+    time.sleep(1)
+    s.close()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-  s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-  s.bind((HOST, PORT))
-  while True:
-    s.listen()
-    conn, addr = s.accept()
-    with conn:
-      print(f"connected by {addr}")
-      data = conn.recv(1024)
-      if not data:
-        break
-      received_message = data.decode()
-      print(f"received message => {received_message}")
-      arguments = received_message.split('#')
-      if arguments[0] == 'start':
-        conference_link = arguments[1]
-        start_round_routine(conference_link)
-      elif arguments[0] == 'end':
-        experiment_name = arguments[1]
-        record_name = arguments[2]
-        end_round_routine(experiment_name, record_name)
-      else:
-        print('received unknown message')
-      conn.sendall(data)
-  time.sleep(1)
-  s.close()
+if __name__ == '__main__':
+  initial_actions()
+  start()

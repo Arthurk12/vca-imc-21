@@ -1,8 +1,8 @@
 from subprocess import Popen
-from platforms.base_vca import base_VCA
-from platforms.constants import ELOS
-from config import Config
-from logger import logger
+from common.platforms.base_vca import base_VCA
+from common.platforms.constants import ELOS
+from common.config import Config
+from common.logger import logger
 import pyautogui
 import time
 

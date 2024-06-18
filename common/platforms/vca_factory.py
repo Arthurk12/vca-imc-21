@@ -1,10 +1,10 @@
-from platforms.elos import Elos
-from platforms.bbb_local_server import BBBLocalServer
-from platforms.meet import Meet
-from platforms.constants import ELOS, BBB_LOCAL, MEET
+from common.platforms.elos import Elos
+from common.platforms.bbb_local_server import BBBLocalServer
+from common.platforms.meet import Meet
+from common.platforms.ivca import Ivca
+from common.platforms.constants import ELOS, BBB_LOCAL, MEET
 
-from platforms.ivca import Ivca
-from logger import logger
+from common.logger import logger
 
 LOG_PREFIX = '[FACTORY_VCA]'
 

@@ -1,6 +1,6 @@
-from platforms.elos import Elos
-from platforms.constants import BBB_LOCAL
-from logger import logger
+from common.platforms.elos import Elos
+from common.platforms.constants import BBB_LOCAL
+from common.logger import logger
 import pyautogui
 import time
 

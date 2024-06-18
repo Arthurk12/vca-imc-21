@@ -1,5 +1,5 @@
 import socket
-from logger import logger
+from common.logger import logger
 
 LOG_PREFIX = '[COORDINATOR]'
 

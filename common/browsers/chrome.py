@@ -1,9 +1,9 @@
 from subprocess import Popen
 import time
 import pyautogui
-from interactor import Interactor
-from config import Config
-from logger import logger
+from common.interactor import Interactor
+from common.config import Config
+from common.logger import logger
 
 LOG_PREFIX = '[CHROME]'
 

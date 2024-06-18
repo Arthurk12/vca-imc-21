@@ -1,14 +1,15 @@
 from subprocess import PIPE, Popen
-from platforms.vca_factory import Factory_vca
-from browsers.chrome import Chrome
-from config import Config
-from coordinator import Coordinator
-from tools.virtual_camera import VirtualCamera
 import argparse
 import time
 import yaml
-from logger import logger
 from beepy import beep
+from common.platforms.vca_factory import Factory_vca
+from common.browsers.chrome import Chrome
+from common.config import Config
+from common.coordinator import Coordinator
+from common.tools.virtual_camera import VirtualCamera
+from common.logger import logger
+
 
 CONFIG_YML = 'config/config.yml'
 LOG_PREFIX = '[MAIN]'

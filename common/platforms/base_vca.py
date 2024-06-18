@@ -1,8 +1,8 @@
-from interactor import Interactor
-from browsers.ibrowser import Ibrowser
+from common.interactor import Interactor
+from common.browsers.ibrowser import Ibrowser
 from subprocess import Popen
-from results_manager import ResultsManager
-from logger import logger
+from common.results_manager import ResultsManager
+from common.logger import logger
 import time
 import os
 import pyautogui

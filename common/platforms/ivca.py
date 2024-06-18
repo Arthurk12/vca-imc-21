@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from browsers.ibrowser import Ibrowser
+from common.browsers.ibrowser import Ibrowser
 
 class Ivca(Protocol):
   
