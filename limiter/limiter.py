@@ -4,6 +4,7 @@ import csv
 import subprocess
 import time
 import socket
+import argparse
 from common.logger import logger
 
 LOG_PREFIX = '[LIMITER]'
@@ -13,12 +14,7 @@ PORT = 6666
 
 last_applied_constraint = None
 seconds_counter = 0
-
-if len(sys.argv) < 2 or sys.argv[1] == '-h':
-  sys.stdout.write("Usage: %s <trace.csv> \n"%sys.argv[0])
-  sys.exit(0)
-
-csv_trace = sys.argv[1]
+args = None
 
 def apply_bandwidth_constraint(constraint_in_bytes_per_second):
   global last_applied_constraint
@@ -38,7 +34,7 @@ def start_shaping(max_seconds):
   global seconds_counter
   logger.debug(f'{LOG_PREFIX} Called start_shaping()')
   # Abre o arquivo CSV
-  with open(csv_trace, "r") as csvfile:
+  with open(args.csv_trace, "r") as csvfile:
     reader = csv.reader(csvfile, delimiter=",")
     next(reader)
 
@@ -57,29 +53,57 @@ def start_shaping(max_seconds):
         clear_bandwidth_constraints()
         break
 
-clear_bandwidth_constraints()
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-  s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-  s.bind((HOST, PORT))
-  logger.debug(f'{LOG_PREFIX} Listening on {HOST} port {PORT}')
-  while True:
-    s.listen()
-    conn, addr = s.accept()
-    with conn:
-      logger.debug(f'{LOG_PREFIX}connected by {addr}')
-      data = conn.recv(1024)
-      if not data:
-        break
-      received_message = data.decode()
-      logger.debug(f'{LOG_PREFIX}received message => {received_message}')
-      arguments = received_message.split('#')
-      command = arguments[0]
-      duration = int(float(arguments[1]))
-      logger.debug(f'{LOG_PREFIX} Identified arguments are command: {command} and duration: {duration}')
-      if command == 'start':
-        conn.sendall(data)
-        start_shaping(duration)
-      else:
-        logger.error(f'{LOG_PREFIX} received unknown message!')
-  time.sleep(1)
-  s.close()
+def build_parser():
+  logger.debug(f'{LOG_PREFIX} Parsing arguments')
+  parser = argparse.ArgumentParser(
+		description='Limit bandwith')
+
+  parser.add_argument(
+		'csv_trace',
+		help='CSV file with the bandwidth shaping pattern to be applied'
+	)
+  logger.debug(f'{LOG_PREFIX} Arguments parsed!')
+  return parser
+
+def startup():
+  global args
+  parser = build_parser()
+  args = parser.parse_args()
+
+def start():
+  clear_bandwidth_constraints()
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((HOST, PORT))
+    logger.debug(f'{LOG_PREFIX} Listening socket on {HOST}:{PORT}')
+    while True:
+      s.listen()
+      conn, addr = s.accept()
+      with conn:
+        logger.debug(f'{LOG_PREFIX} Connected by {addr}')
+        data = conn.recv(1024)
+        if not data:
+          break
+        received_message = data.decode()
+        logger.debug(f'{LOG_PREFIX} Received message => {received_message}')
+        arguments = received_message.split('#')
+        command = arguments[0]
+        duration = int(float(arguments[1]))
+        logger.debug(f'{LOG_PREFIX} Identified arguments are command: {command} and duration: {duration}')
+        if command == 'start':
+          conn.sendall(data)
+          start_shaping(duration)
+        else:
+          logger.error(f'{LOG_PREFIX} Received unknown message!')
+    time.sleep(1)
+    s.close()
+
+if __name__ == '__main__':
+  try:
+    startup()
+    start()
+  except Exception as error:
+    logger.error(error)
+    quit(-1)
+  quit()
+
