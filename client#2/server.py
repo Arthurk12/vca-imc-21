@@ -133,7 +133,7 @@ def execute():
         elif arguments[0] == 'end':
           experiment_name = arguments[1]
           record_name = arguments[2]
-          logger.debug(f'{LOG_PREFIX} Identified END message with experiment name: {experiment_name} and {record_name}')
+          logger.debug(f'{LOG_PREFIX} Identified END message with experiment name: {experiment_name} and record name: {record_name}')
           end_round_routine(experiment_name, record_name)
         else:
           logger.warn(f'{LOG_PREFIX} Received unknown message!')
