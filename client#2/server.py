@@ -7,9 +7,10 @@ from common.config import Config
 from common.browsers.chrome import Chrome
 from common.interactor import Interactor
 from common.results_manager import ResultsManager
+from common.logger import logger
 
-LOG_PREFIX = '[SERVER]'
 CONFIG_YML = 'config/config.yml'
+LOG_PREFIX = '[SERVER]'
 
 HOST = ''
 PORT = 12345
@@ -17,21 +18,19 @@ chrome = None
 interactor = None
 has_started = False
 
-def file_or_directory_exists(path):
-  return os.path.exists(path)
-
-def is_file_empty(file_path):
-  return (not os.path.exists(file_path))
-
 def toggle_recording():
+  logger.debug(f'{LOG_PREFIX} Called toggle_reccording()')
   pyautogui.hotkey('ctrl', 'shift', 'alt', 'r')
 
 def load_configs():
+  logger.debug(f'{LOG_PREFIX} Loading configs')
   with open(CONFIG_YML, 'r') as f:
     data = yaml.load(f, Loader=yaml.FullLoader)
     Config.init(data)
+    logger.debug(f'{LOG_PREFIX} Configs loaded!')
 
-def initial_actions():
+def startup():
+  logger.debug(f'{LOG_PREFIX} Script startup')
   load_configs()
 
   chrome = Chrome()
@@ -42,6 +41,7 @@ def initial_actions():
   chrome.open_new_tab()
 
 def elos_setup():
+  logger.warn(f'{LOG_PREFIX} Called elos_setup()')
   time.sleep(3)
   #confirm page reload
   pyautogui.hotkey('enter')
@@ -61,6 +61,7 @@ def elos_setup():
   pyautogui.hotkey('enter')
 
 def meet_setup():
+  logger.warn(f'{LOG_PREFIX} Called meet_setup()')
   #wait for the page to load
   time.sleep(10)
   #mute microphone
@@ -70,8 +71,9 @@ def meet_setup():
 
 def start_round_routine(conference_link):
   global has_started
+  logger.debug(f'{LOG_PREFIX} Called start_round_routine()')
   if has_started:
-    print('Received experiment start message when experiment has already started!')
+    logger.warn(f'{LOG_PREFIX} Received experiment start message when experiment has already started!')
     pass
 
   has_started = True
@@ -82,14 +84,15 @@ def start_round_routine(conference_link):
   elif 'meet' in conference_link:
     meet_setup()
   else:
-    print(f'Unknown VCA: {conference_link}')
+    logger.error(f'{LOG_PREFIX} Unknown VCA: {conference_link}')
 
   toggle_recording()
 
 def end_round_routine(experiment_name, record_name):
   global has_started
+  logger.debug(f'{LOG_PREFIX} Called end_round_routine()')
   if not has_started:
-    print('Received experiment end message when experiment has already ended!')
+    logger.warn(f'{LOG_PREFIX} Received experiment end message when experiment has already ended!')
     pass
 
   has_started = False
@@ -106,34 +109,44 @@ def end_round_routine(experiment_name, record_name):
   chrome.switch_tab()
 
 
-def start():
+def execute():
+  logger.debug(f'{LOG_PREFIX} Called execute()')
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
+    logger.debug(f'{LOG_PREFIX} Listening socket on {HOST}:{PORT} waiting for conference link')
     while True:
       s.listen()
       conn, addr = s.accept()
       with conn:
-        print(f"connected by {addr}")
+        logger.debug(f'{LOG_PREFIX} Connected by {addr}')
         data = conn.recv(1024)
         if not data:
           break
         received_message = data.decode()
-        print(f"received message => {received_message}")
+        logger.debug(f'{LOG_PREFIX} Received message => {received_message}')
         arguments = received_message.split('#')
         if arguments[0] == 'start':
           conference_link = arguments[1]
+          logger.debug(f'{LOG_PREFIX} Identified START message with conference link: {conference_link}')
           start_round_routine(conference_link)
         elif arguments[0] == 'end':
           experiment_name = arguments[1]
           record_name = arguments[2]
+          logger.debug(f'{LOG_PREFIX} Identified END message with experiment name: {experiment_name} and {record_name}')
           end_round_routine(experiment_name, record_name)
         else:
-          print('received unknown message')
+          logger.warn(f'{LOG_PREFIX} Received unknown message!')
         conn.sendall(data)
     time.sleep(1)
     s.close()
 
 if __name__ == '__main__':
-  initial_actions()
-  start()
+  try:
+    startup()
+    execute()
+  except Exception as error:
+    logger.error(error)
+    Chrome.quit()
+    quit(-1)
+  quit()
