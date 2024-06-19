@@ -1,6 +1,6 @@
-argparse
-opencv-python
-guibot
-pyautogui
-pyyaml
-beepy
+argparse==1.4.0
+opencv-python==4.10.0.84
+guibot==0.51.1
+pyautogui==0.9.54
+pyyaml==5.3.1
+beepy==1.0.7
