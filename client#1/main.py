@@ -41,8 +41,6 @@ def run(args, round):
 
 	logger.debug(f'{LOG_PREFIX} Calling share_camera()')
 	ivca.share_camera()
-	##TODO: Restart video stream to make sure the videos are synced in every round independently
-	##			of the videoconferencing plataform being tested
 
   # Send command to shaper machine to start shaping network
 	logger.debug(f'{LOG_PREFIX} Creating Coordinator to notify start of round')
@@ -61,8 +59,6 @@ def run(args, round):
 		coordinator.notify('#'.join(['end', args.experiment, ivca.create_webrtc_filename()]))
 
 	ivca.quit_call()
-
-	# TODO: SHAPING SHOULD STOP HERE
 
 	del ivca
 

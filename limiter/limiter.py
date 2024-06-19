@@ -1,4 +1,3 @@
-## TODO: add readme to this folder explaining how to configure it(shaped interface, scripts)
 import sys
 import csv
 import subprocess
