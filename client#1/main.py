@@ -11,7 +11,7 @@ from common.tools.virtual_camera import VirtualCamera
 from common.logger import logger
 
 
-CONFIG_YML = 'config/config.yml'
+CONFIG_YML = '../config/config.yml'
 LOG_PREFIX = '[MAIN]'
 
 

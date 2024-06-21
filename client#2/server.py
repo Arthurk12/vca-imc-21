@@ -9,7 +9,7 @@ from common.interactor import Interactor
 from common.results_manager import ResultsManager
 from common.logger import logger
 
-CONFIG_YML = 'config/config.yml'
+CONFIG_YML = '../config/config.yml'
 LOG_PREFIX = '[SERVER]'
 
 HOST = ''
