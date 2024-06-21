@@ -102,7 +102,7 @@ def end_round_routine(experiment_name, record_name):
   interactor.guibot_cliick('download.png', 20)
   time.sleep(2)
 
-  results_manager = ResultsManager(experiment_name+'_server')
+  results_manager = ResultsManager(experiment_name+'_client#2')
   results_manager.move_webrtc_dump(record_name)
   results_manager.move_video(record_name)
 
