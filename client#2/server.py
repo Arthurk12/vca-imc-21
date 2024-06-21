@@ -41,7 +41,7 @@ def startup():
   chrome.open_new_tab()
 
 def elos_setup():
-  logger.warn(f'{LOG_PREFIX} Called elos_setup()')
+  logger.info(f'{LOG_PREFIX} Called elos_setup()')
   time.sleep(3)
   #confirm page reload
   pyautogui.hotkey('enter')
@@ -61,7 +61,7 @@ def elos_setup():
   pyautogui.hotkey('enter')
 
 def meet_setup():
-  logger.warn(f'{LOG_PREFIX} Called meet_setup()')
+  logger.info(f'{LOG_PREFIX} Called meet_setup()')
   #wait for the page to load
   time.sleep(10)
   #mute microphone
