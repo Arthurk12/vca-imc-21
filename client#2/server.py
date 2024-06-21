@@ -30,6 +30,8 @@ def load_configs():
     logger.debug(f'{LOG_PREFIX} Configs loaded!')
 
 def startup():
+  global chrome
+  global interactor
   logger.debug(f'{LOG_PREFIX} Script startup')
   load_configs()
 
@@ -71,6 +73,7 @@ def meet_setup():
 
 def start_round_routine(conference_link):
   global has_started
+  global chrome
   logger.debug(f'{LOG_PREFIX} Called start_round_routine()')
   if has_started:
     logger.warn(f'{LOG_PREFIX} Received experiment start message when experiment has already started!')
@@ -90,6 +93,7 @@ def start_round_routine(conference_link):
 
 def end_round_routine(experiment_name, record_name):
   global has_started
+  global chrome
   logger.debug(f'{LOG_PREFIX} Called end_round_routine()')
   if not has_started:
     logger.warn(f'{LOG_PREFIX} Received experiment end message when experiment has already ended!')
