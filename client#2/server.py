@@ -7,6 +7,7 @@ from common.config import Config
 from common.browsers.chrome import Chrome
 from common.interactor import Interactor
 from common.results_manager import ResultsManager
+from common.tools.virtual_camera import VirtualCamera
 from common.logger import logger
 
 CONFIG_YML = '../config/config.yml'
@@ -17,6 +18,7 @@ PORT = 12345
 chrome = None
 interactor = None
 has_started = False
+virtual_camera = None
 
 def toggle_recording():
   logger.debug(f'{LOG_PREFIX} Called toggle_reccording()')
@@ -30,10 +32,15 @@ def load_configs():
     logger.debug(f'{LOG_PREFIX} Configs loaded!')
 
 def startup():
+  global virtual_camera
   global chrome
   global interactor
   logger.debug(f'{LOG_PREFIX} Script startup')
   load_configs()
+
+  virtual_camera = VirtualCamera()
+  virtual_camera.start_virtual_camera()
+
 
   chrome = Chrome()
   interactor = Interactor()
@@ -79,6 +86,11 @@ def start_round_routine(conference_link):
     logger.warn(f'{LOG_PREFIX} Received experiment start message when experiment has already started!')
     pass
 
+  pyautogui.write(conference_link)
+  time.sleep(1)
+  pyautogui.hotkey('enter')
+  time.sleep(1)
+
   has_started = True
   # To reset the webRTC dump
   chrome.refresh_tab()
@@ -111,6 +123,7 @@ def end_round_routine(experiment_name, record_name):
   results_manager.move_video(record_name)
 
   chrome.switch_tab()
+  virtual_camera.stop_virtual_camera()
 
 
 def execute():
