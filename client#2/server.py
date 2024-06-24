@@ -86,9 +86,6 @@ def start_round_routine(conference_link):
     logger.warn(f'{LOG_PREFIX} Received experiment start message when experiment has already started!')
     pass
 
-  pyautogui.write(conference_link)
-  time.sleep(1)
-  pyautogui.hotkey('enter')
   time.sleep(1)
 
   has_started = True
