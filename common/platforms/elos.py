@@ -33,8 +33,9 @@ class Elos(base_VCA):
   def join_meeting(self):
     logger.debug(f'{LOG_PREFIX} Pre-join actions')
     if not self.is_api:
-      time.sleep(1)
+      time.sleep(3)
       pyautogui.hotkey('enter')
+    time.sleep(4)
       # self.guibot_click('elos_join_meeting.png')
   
   def pos_join_actions(self):
@@ -63,6 +64,8 @@ class Elos(base_VCA):
 
     pyautogui.hotkey('tab')
     pyautogui.write(self.record+'@test.com')
+
+    time.sleep(2)
 
     pyautogui.hotkey('enter')
 
@@ -134,7 +137,7 @@ class Elos(base_VCA):
       Elos.medium_quaity()
 
     # skip to the "share" button
-    for x in range(6):
+    for x in range(4):
       pyautogui.hotkey('tab')
       time.sleep(0.05)
     pyautogui.hotkey('enter')
