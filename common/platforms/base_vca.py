@@ -25,10 +25,7 @@ class base_VCA:
     self.results_manager = ResultsManager(args.experiment)
     self.interactor = Interactor()
     self.is_screen_recording = False
-    
-    logger.debug(f'{LOG_PREFIX} Toggling screen capture. It should be starting now.')
-    self.toggle_screen_recording()
-  
+
   def toggle_screen_recording(self):
     logger.debug(f'{LOG_PREFIX} toggling screeen recording')
     time.sleep(1)
@@ -106,6 +103,8 @@ class base_VCA:
     return
   
   def collect_data(self):
+    logger.debug(f'{LOG_PREFIX} Toggling screen capture. It should be starting now.')
+    self.toggle_screen_recording()
     logger.debug(f'{LOG_PREFIX} Collecting data')
     self.get_time()
     self.capture_traffic()
