@@ -63,7 +63,7 @@ def elos_setup():
   #wait for the modal to load
   time.sleep(5)
   #9 tabs til "share camera" is selected
-  for i in range(9):
+  for i in range(8):
     pyautogui.hotkey('tab')
     time.sleep(0.05)
   #click "share camera"
