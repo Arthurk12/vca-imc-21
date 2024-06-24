@@ -120,7 +120,6 @@ def end_round_routine(experiment_name, record_name):
   results_manager.move_video(record_name)
 
   chrome.switch_tab()
-  virtual_camera.stop_virtual_camera()
 
 
 def execute():
