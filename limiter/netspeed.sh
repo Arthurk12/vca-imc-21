@@ -16,7 +16,7 @@ LIMIT_LOWER_BOUND=1000
 
 # hardcoded constats
 IFACE=ifb0 # fake interface name which will be used for shaping the traffic
-NETFACE=enp2s0 # interface which in connected to the internet
+NETFACE=eno1 # interface which in connected to the internet
 
 # shift all required and leave only optional
 
