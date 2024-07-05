@@ -31,7 +31,7 @@ while getopts ':hl:s' option; do
       ;;
   esac
 done
-LIMIT_IN_BITS=$(limitToBits "$LIMIT")
+
 #
 # functions used in script
 #
@@ -86,8 +86,8 @@ function createLimit {
   #3. redirect ingress
   tc qdisc add dev $NETFACE handle ffff: ingress
   tc filter add dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
-
-  EFECTIVE_LIMIT=$(($LIMIT_IN_BITS < $LIMIT_LOWER_BOUND ? "1bit" : $LIMIT)) 
+  local limit_in_bits=$(limitToBits "$LIMIT")
+  EFECTIVE_LIMIT=$(($limit_in_bits < $LIMIT_LOWER_BOUND ? "1bit" : $LIMIT)) 
 
   #4. apply egress rules to local inteface (like wlan0)
   tc qdisc add dev $NETFACE root handle 1: htb default 10
@@ -102,8 +102,8 @@ function createLimit {
 function updateLimit {
   #3. redirect ingress
   tc filter replace dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
-
-  EFECTIVE_LIMIT=$(($LIMIT < $LIMIT_LOWER_BOUND ? "1bit" : $LIMIT)) 
+  local limit_in_bits=$(limitToBits "$LIMIT")
+  EFECTIVE_LIMIT=$(($limit_in_bits < $LIMIT_LOWER_BOUND ? "1bit" : $LIMIT)) 
 
   #4. apply egress rules to local inteface (like wlan0)
   tc class replace dev $NETFACE parent 1: classid 1:1 htb rate $EFECTIVE_LIMIT
