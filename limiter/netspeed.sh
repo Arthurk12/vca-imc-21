@@ -7,7 +7,7 @@ usage="sudo $(basename "$0") -l speed_limit -s
 "
 
 # default values
-LIMIT=0
+LIMIT=u
 STOP=0
 
 #limit values under the LIMIT_LOWER_BOUND will be mapped into an effective limit of 1bit/s which is virtually no connection
@@ -64,54 +64,60 @@ function ifaceIsUp {
   fi
 }
 function limitToBits() {
-  local limit=$1
-  local limit_value=$(echo "$limit" | sed 's/[a-z]*//')
-  local limit_unit=$(echo "$limit" | sed 's/[0-9]*//')
+  local limit_value=$(echo "$LIMIT" | sed 's/[^0-9.]//g')
+  local limit_unit=$(echo "$LIMIT" | sed 's/[0-9.]*//')
 
   case "$limit_unit" in
-    bit) echo $limit_value;;
-    kbit) echo $(bc <<< "scale=0; $limit_value * 1000");;
-    mbit) echo $(bc <<< "scale=0; $limit_value * 1000000");;
-    gbit) echo $(bc <<< "scale=0; $limit_value * 1000000000");;
-    tbit) echo $(bc <<< "scale=0; $limit_value * 1000000000000");;
-    bps) echo $(bc <<< "scale=0; $limit_value / 8");;
-    kbps) echo $(bc <<< "scale=0; $limit_value * 1000 / 8");;
-    mbps) echo $(bc <<< "scale=0; $limit_value * 1000000 / 8");;
-    gbps) echo $(bc <<< "scale=0; $limit_value * 1000000000 / 8");;
-    tbps) echo $(bc <<< "scale=0; $limit_value * 1000000000000 / 8");;
-    *) echo "Unknown unit: $limit_unit"; exit 1;;
+    bit) echo $(bc <<< "scale=0; $limit_value / 1" | cut -d'.' -f1);;
+    kbit) echo $(bc <<< "scale=0; $limit_value * 1000" | cut -d'.' -f1);;
+    mbit) echo $(bc <<< "scale=0; $limit_value * 1000000" | cut -d'.' -f1);;
+    gbit) echo $(bc <<< "scale=0; $limit_value * 1000000000" | cut -d'.' -f1);;
+    tbit) echo $(bc <<< "scale=0; $limit_value * 1000000000000" | cut -d'.' -f1);;
+    bps) echo $(bc <<< "scale=0; $limit_value / 8" | cut -d'.' -f1);;
+    kbps) echo $(bc <<< "scale=0; $limit_value * 1000 / 8" | cut -d'.' -f1);;
+    mbps) echo $(bc <<< "scale=0; $limit_value * 1000000 / 8" | cut -d'.' -f1);;
+    gbps) echo $(bc <<< "scale=0; $limit_value * 1000000000 / 8" | cut -d'.' -f1);;
+    tbps) echo $(bc <<< "scale=0; $limit_value * 1000000000000 / 8" | cut -d'.' -f1);;
+    *) echo $(bc <<< "scale=0; $limit_value / 1" | cut -d'.' -f1);; #default unit si bits
   esac
 }
 function createLimit {
   #3. redirect ingress
   tc qdisc add dev $NETFACE handle ffff: ingress
   tc filter add dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
-  local limit_in_bits=$(limitToBits "$LIMIT")
-  EFECTIVE_LIMIT=$(($limit_in_bits < $LIMIT_LOWER_BOUND ? "1bit" : $LIMIT)) 
-
+  local limit_in_bits=$(limitToBits)
+  if [ $limit_in_bits -lt $LIMIT_LOWER_BOUND ]; then
+    efective_limit="1bit"
+  else
+    efective_limit=$LIMIT
+  fi
   #4. apply egress rules to local inteface (like wlan0)
   tc qdisc add dev $NETFACE root handle 1: htb default 10
-  tc class add dev $NETFACE parent 1: classid 1:1 htb rate $EFECTIVE_LIMIT
-  tc class add dev $NETFACE parent 1:1 classid 1:10 htb rate $EFECTIVE_LIMIT
+  tc class add dev $NETFACE parent 1: classid 1:1 htb rate $efective_limit
+  tc class add dev $NETFACE parent 1:1 classid 1:10 htb rate $efective_limit
 
   #5. and same for our relaying virtual interfaces (to simulate ingress)
   tc qdisc add dev $IFACE root handle 1: htb default 10
-  tc class add dev $IFACE parent 1: classid 1:1 htb rate $EFECTIVE_LIMIT
-  tc class add dev $IFACE parent 1:1 classid 1:10 htb rate $EFECTIVE_LIMIT
+  tc class add dev $IFACE parent 1: classid 1:1 htb rate $efective_limit
+  tc class add dev $IFACE parent 1:1 classid 1:10 htb rate $efective_limit
 }
 function updateLimit {
   #3. redirect ingress
   tc filter replace dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
-  local limit_in_bits=$(limitToBits "$LIMIT")
-  EFECTIVE_LIMIT=$(($limit_in_bits < $LIMIT_LOWER_BOUND ? "1bit" : $LIMIT)) 
-
+  local limit_in_bits=$(limitToBits)
+  if [ $limit_in_bits -lt $LIMIT_LOWER_BOUND ]; then
+    efective_limit="1bit"
+  else
+    efective_limit=$LIMIT
+  fi
+  echo "efective limit is: $efective_limit"
   #4. apply egress rules to local inteface (like wlan0)
-  tc class replace dev $NETFACE parent 1: classid 1:1 htb rate $EFECTIVE_LIMIT
-  tc class replace dev $NETFACE parent 1:1 classid 1:10 htb rate $EFECTIVE_LIMIT
+  tc class replace dev $NETFACE parent 1: classid 1:1 htb rate $efective_limit
+  tc class replace dev $NETFACE parent 1:1 classid 1:10 htb rate $efective_limit
 
   #5. and same for our relaying virtual interfaces (to simulate ingress)
-  tc class replace dev $IFACE parent 1: classid 1:1 htb rate $EFECTIVE_LIMIT
-  tc class replace dev $IFACE parent 1:1 classid 1:10 htb rate $EFECTIVE_LIMIT
+  tc class replace dev $IFACE parent 1: classid 1:1 htb rate $efective_limit
+  tc class replace dev $IFACE parent 1:1 classid 1:10 htb rate $efective_limit
 }
 function removeLimit {
   if limitExists ; then
@@ -136,7 +142,7 @@ if [ $STOP -eq 1 ]; then
   echo "REMOVING limit"
   removeLimit
   echo "limit REMOVED"
-elif [ "$LIMIT" != "0" ]; then
+elif [ "$LIMIT" != "u" ]; then
   # prepare interface
   if ! ifaceExists ; then
     echo "CREATING $IFACE by modprobe"
