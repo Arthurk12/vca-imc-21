@@ -70,15 +70,15 @@ function limitToBits() {
 
   case "$limit_unit" in
     bit) echo $limit_value;;
-    kbit) echo $(($limit_value * 1000));;
-    mbit) echo $(($limit_value * 1000000));;
-    gbit) echo $(($limit_value * 1000000000));;
-    tbit) echo $(($limit_value * 1000000000000));;
-    bps) echo $(($limit_value / 8));;
-    kbps) echo $(($limit_value * 1000 / 8));;
-    mbps) echo $(($limit_value * 1000000 / 8));;
-    gbps) echo $(($limit_value * 1000000000 / 8));;
-    tbps) echo $(($limit_value * 1000000000000 / 8));;
+    kbit) echo $(bc <<< "scale=0; $limit_value * 1000");;
+    mbit) echo $(bc <<< "scale=0; $limit_value * 1000000");;
+    gbit) echo $(bc <<< "scale=0; $limit_value * 1000000000");;
+    tbit) echo $(bc <<< "scale=0; $limit_value * 1000000000000");;
+    bps) echo $(bc <<< "scale=0; $limit_value / 8");;
+    kbps) echo $(bc <<< "scale=0; $limit_value * 1000 / 8");;
+    mbps) echo $(bc <<< "scale=0; $limit_value * 1000000 / 8");;
+    gbps) echo $(bc <<< "scale=0; $limit_value * 1000000000 / 8");;
+    tbps) echo $(bc <<< "scale=0; $limit_value * 1000000000000 / 8");;
     *) echo "Unknown unit: $limit_unit"; exit 1;;
   esac
 }

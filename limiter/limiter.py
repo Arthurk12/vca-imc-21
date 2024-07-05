@@ -19,7 +19,7 @@ def apply_bandwidth_constraint(constraint_in_bits_per_second):
   global last_applied_constraint
   if constraint_in_bits_per_second != last_applied_constraint:
     logger.debug(f'{LOG_PREFIX} Applying constraint: {constraint_in_bits_per_second} bits per second')
-    apply_constraint_command = f'sudo ./netspeed.sh -l {constraint_in_bits_per_second}bps'
+    apply_constraint_command = f'sudo ./netspeed.sh -l {constraint_in_bits_per_second}bit'
     subprocess.run(apply_constraint_command, shell=True)
 
     last_applied_constraint = constraint_in_bits_per_second
