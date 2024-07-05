@@ -15,14 +15,14 @@ last_applied_constraint = None
 seconds_counter = 0
 args = None
 
-def apply_bandwidth_constraint(constraint_in_bytes_per_second):
+def apply_bandwidth_constraint(constraint_in_bits_per_second):
   global last_applied_constraint
-  if constraint_in_bytes_per_second != last_applied_constraint:
-    logger.debug(f'{LOG_PREFIX} Applying constraint: {constraint_in_bytes_per_second} bytes per second')
-    apply_constraint_command = f'sudo ./netspeed.sh -l {constraint_in_bytes_per_second}bps'
+  if constraint_in_bits_per_second != last_applied_constraint:
+    logger.debug(f'{LOG_PREFIX} Applying constraint: {constraint_in_bits_per_second} bits per second')
+    apply_constraint_command = f'sudo ./netspeed.sh -l {constraint_in_bits_per_second}bps'
     subprocess.run(apply_constraint_command, shell=True)
 
-    last_applied_constraint = constraint_in_bytes_per_second
+    last_applied_constraint = constraint_in_bits_per_second
 
 def clear_bandwidth_constraints():
   logger.debug(f'{LOG_PREFIX} Clearing bandwidth constraints')
