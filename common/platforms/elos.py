@@ -40,10 +40,6 @@ class Elos(base_VCA):
   
   def pos_join_actions(self):
     logger.debug(f'{LOG_PREFIX} Pos-join actions')
-    if Config.get_elos_join_microphone():
-      self.join_microphone()
-    else:
-      self.close_audio_modal()
   
   def share_camera(self):
     logger.debug(f'{LOG_PREFIX} Sharing camera with quality: {Config.get_elos_video_quality()}')
@@ -117,7 +113,7 @@ class Elos(base_VCA):
     time.sleep(5)
 
     # select fake cam from dropdown
-    for x in range(2):
+    for x in range(3):
       pyautogui.hotkey('tab')
       time.sleep(0.05)
     pyautogui.hotkey('enter')

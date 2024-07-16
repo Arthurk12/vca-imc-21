@@ -59,6 +59,3 @@ class Config:
 
   def get_elos_video_quality():
     return Config.get_platforms_configs()['elos']['videoQuality']
-
-  def get_elos_join_microphone():
-    return Config.get_platforms_configs()['elos']['joinMicrophone']

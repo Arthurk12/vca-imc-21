@@ -56,8 +56,6 @@ def elos_setup():
   pyautogui.hotkey('enter')
   #wait for the page to load
   time.sleep(10)
-  #close audio modal
-  interactor.guibot_cliick('close_audio_modal.png', 20)
   #open camera modal
   interactor.guibot_cliick('elos_camera_open_modal.png', 20)
   #wait for the modal to load
