@@ -16,7 +16,7 @@ LIMIT_LOWER_BOUND=1000
 
 # hardcoded constats
 IFACE=ifb0 # fake interface name which will be used for shaping the traffic
-NETFACE=eno1 # interface which in connected to the internet
+NETFACE=enx28ee521ab790 # interface which in connected to the internet
 
 # shift all required and leave only optional
 
@@ -87,37 +87,45 @@ function createLimit {
   tc filter add dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
   local limit_in_bits=$(limitToBits)
   if [ $limit_in_bits -lt $LIMIT_LOWER_BOUND ]; then
-    efective_limit="1bit"
+    effective_limit="1bit"
   else
-    efective_limit=$LIMIT
+    effective_limit=$LIMIT
   fi
   #4. apply egress rules to local inteface (like wlan0)
-  tc qdisc add dev $NETFACE root handle 1: htb default 10
-  tc class add dev $NETFACE parent 1: classid 1:1 htb rate $efective_limit
-  tc class add dev $NETFACE parent 1:1 classid 1:10 htb rate $efective_limit
+  tc qdisc add dev $NETFACE root handle 1: tbf rate $effective_limit burst 16kbit latency 50ms
+  
+  # tc qdisc add dev $NETFACE root handle 1: htb default 10
+  # tc class add dev $NETFACE parent 1: classid 1:1 htb rate $efective_limit
+  # tc class add dev $NETFACE parent 1:1 classid 1:10 htb rate $efective_limit
 
   #5. and same for our relaying virtual interfaces (to simulate ingress)
-  tc qdisc add dev $IFACE root handle 1: htb default 10
-  tc class add dev $IFACE parent 1: classid 1:1 htb rate $efective_limit
-  tc class add dev $IFACE parent 1:1 classid 1:10 htb rate $efective_limit
+  tc qdisc add dev $IFACE root handle 1: tbf rate $effective_limit burst 16kbit latency 50ms
+  # tc qdisc add dev $IFACE root handle 1: htb default 10
+  # tc class add dev $IFACE parent 1: classid 1:1 htb rate $efective_limit
+  # tc class add dev $IFACE parent 1:1 classid 1:10 htb rate $efective_limit
 }
 function updateLimit {
   #3. redirect ingress
-  tc filter replace dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
+  # tc filter replace dev $NETFACE parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev $IFACE
   local limit_in_bits=$(limitToBits)
   if [ $limit_in_bits -lt $LIMIT_LOWER_BOUND ]; then
-    efective_limit="1bit"
+    effective_limit="1bit"
   else
-    efective_limit=$LIMIT
+    effective_limit=$LIMIT
   fi
-  echo "efective limit is: $efective_limit"
+  echo "efective limit is: $effective_limit"
+    # Update TBF for outbound traffic on eth0
+  tc qdisc change dev $NETFACE root handle 1: tbf rate $effective_limit burst 16kbit latency 50ms
+
+  # Update TBF for outbound traffic on ifb0
+  tc qdisc change dev $IFACE root handle 1: tbf rate $effective_limit burst 16kbit latency 50ms
   #4. apply egress rules to local inteface (like wlan0)
-  tc class replace dev $NETFACE parent 1: classid 1:1 htb rate $efective_limit
-  tc class replace dev $NETFACE parent 1:1 classid 1:10 htb rate $efective_limit
+  # tc class replace dev $NETFACE parent 1: classid 1:1 htb rate $efective_limit
+  # tc class replace dev $NETFACE parent 1:1 classid 1:10 htb rate $efective_limit
 
   #5. and same for our relaying virtual interfaces (to simulate ingress)
-  tc class replace dev $IFACE parent 1: classid 1:1 htb rate $efective_limit
-  tc class replace dev $IFACE parent 1:1 classid 1:10 htb rate $efective_limit
+  # tc class replace dev $IFACE parent 1: classid 1:1 htb rate $efective_limit
+  # tc class replace dev $IFACE parent 1:1 classid 1:10 htb rate $efective_limit
 }
 function removeLimit {
   if limitExists ; then
