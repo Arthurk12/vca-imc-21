@@ -71,8 +71,6 @@ def meet_setup():
   logger.info(f'{LOG_PREFIX} Called meet_setup()')
   #wait for the page to load
   time.sleep(10)
-  #mute microphone
-  interactor.guibot_cliick('meet_mute_mic.png', 20)
   #click to join
   interactor.guibot_cliick('meet_join_now.png', 20)
 
