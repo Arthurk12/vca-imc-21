@@ -25,6 +25,7 @@ class Elos(base_VCA):
   def pre_join_actions(self):
     if not self.is_api:    
       logger.debug(f'{LOG_PREFIX} Is not API. Pre-join actions')
+      self.exit_previous_user_data()
       self.join_as_guest()
       self.enter_guest_data()
     else:
@@ -45,6 +46,13 @@ class Elos(base_VCA):
     logger.debug(f'{LOG_PREFIX} Sharing camera with quality: {Config.get_elos_video_quality()}')
     self._share_camera(Config.get_elos_video_quality())
   
+  def exit_previous_user_data(self):
+    try:
+      logger.debug(f'{LOG_PREFIX} Exit previous user data')
+      self.guibot_click('elos_wrong_person.png')
+    except Exception as e:
+      logger.debug(f'{LOG_PREFIX} Apparently there is no previous user data {e}')
+
   def join_as_guest(self):
     logger.debug(f'{LOG_PREFIX} Joining as guest')
     time.sleep(2)
