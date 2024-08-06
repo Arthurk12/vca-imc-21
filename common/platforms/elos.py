@@ -35,9 +35,9 @@ class Elos(base_VCA):
     logger.debug(f'{LOG_PREFIX} Pre-join actions')
     if not self.is_api:
       time.sleep(3)
-      pyautogui.hotkey('enter')
+      # pyautogui.hotkey('enter')
+      self.guibot_click('elos_join_meeting.png')
     time.sleep(4)
-      # self.guibot_click('elos_join_meeting.png')
   
   def pos_join_actions(self):
     logger.debug(f'{LOG_PREFIX} Pos-join actions')
